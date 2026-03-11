@@ -94,7 +94,7 @@ function readProfile_(ss) {
     return {
       name: pickByHeader_(headers, row, ['name','이름']) || '',
       email: pickByHeader_(headers, row, ['email','메일']) || '',
-      instagram: pickByHeader_(headers, row, ['instagram','인스타']) || '',
+      instagram: pickByHeader_(headers, row, ['instagram','insta','ig','인스타','인스타그램','아이디']) || '',
       website: pickByHeader_(headers, row, ['website','웹사이트','site']) || ''
     };
   }
@@ -110,7 +110,7 @@ function readProfile_(ss) {
   return {
     name: map['name'] || map['이름'] || '',
     email: map['email'] || map['메일'] || '',
-    instagram: map['instagram'] || map['인스타'] || '',
+    instagram: map['instagram'] || map['insta'] || map['ig'] || map['인스타'] || map['인스타그램'] || map['아이디'] || '',
     website: map['website'] || map['웹사이트'] || map['site'] || ''
   };
 }
@@ -190,7 +190,10 @@ function readNotes_(ss, sheetName) {
     const mdPathFromSheet = looksLikePath_(mdSource) ? mdSource : '';
     const mdText = mdPathFromSheet ? '' : resolveMarkdown_(mdSource);
     const fileName = itemKey + '.md';
-    const mdPath = mdPathFromSheet || buildNotePathFromTitle_(title);
+    let mdPath = mdPathFromSheet || buildNotePathFromTitle_(title);
+    if (mdPathFromSheet && /^notes\/\d{4}-\d{2}-\d{2}-/.test(mdPathFromSheet)) {
+      mdPath = buildNotePathFromTitle_(title);
+    }
 
     if (mdText) files.push({ fileName: fileName, content: mdText || '' });
     const item = {
