@@ -28,34 +28,35 @@ const SHEETS = {
 function publishAll() {
   ensureToken_();
   const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  const profile = readProfile_(ss);
-  const courses = readSection_(ss, SHEETS.courses);
-  const projects = readSection_(ss, SHEETS.projects);
-  const exhibitions = readSection_(ss, SHEETS.exhibitions);
+  // Raw exports (header + rows)
+  writeRawSheet_(ss, SHEETS.profile, 'raw/profile.json');
+  writeRawSheet_(ss, SHEETS.courses, 'raw/courses.json');
+  writeRawSheet_(ss, SHEETS.projects, 'raw/projects.json');
+  writeRawSheet_(ss, SHEETS.exhibitions, 'raw/exhibitions.json');
+  writeRawSheet_(ss, SHEETS.notes, 'raw/notes.json');
+  writeRawSheet_(ss, SHEETS.order, 'raw/order.json');
+
+  // If Notes Text column contains raw markdown (not path), emit md files
   const notes = readNotes_(ss, SHEETS.notes);
-
-  const sectionOrder = readSectionOrder_(ss) || ['courses','exhibitions','projects','notes'];
-
-  const dashboard = {
-    ok: true,
-    profile: profile,
-    sectionOrder: sectionOrder,
-    courses: courses.active,
-    exhibitions: exhibitions.active,
-    projects: projects.active,
-    notes: notes.active
-  };
-
-  putJson_('dashboard.json', dashboard);
-  putJson_('sections/courses.json', { ok: true, items: courses.all });
-  putJson_('sections/exhibitions.json', { ok: true, items: exhibitions.all });
-  putJson_('sections/projects.json', { ok: true, items: projects.all });
-  putJson_('sections/notes.json', { ok: true, items: notes.all });
-
-  // note markdown files
   notes.files.forEach(function(f) {
     putText_('notes/' + f.fileName, f.content);
   });
+}
+
+function writeRawSheet_(ss, sheetName, filePath) {
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    putJson_(filePath, { sheet: sheetName, headers: [], rows: [] });
+    return;
+  }
+  const values = sheet.getDataRange().getValues();
+  if (!values || !values.length) {
+    putJson_(filePath, { sheet: sheetName, headers: [], rows: [] });
+    return;
+  }
+  const headers = values[0] || [];
+  const rows = values.slice(1);
+  putJson_(filePath, { sheet: sheetName, headers: headers, rows: rows });
 }
 
 function ensureToken_() {

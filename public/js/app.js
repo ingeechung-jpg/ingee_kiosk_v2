@@ -76,10 +76,14 @@
   function callStatic(method, args, onSuccess, onFailure) {
     try {
       if (method === 'getDashboardData') {
-        fetchJson('dashboard.json').then(function(data) {
-          if (data && data.ok === false) throw new Error(data.message || 'Static dashboard error');
+        loadStaticRaw().then(function(data) {
           onSuccess && onSuccess(data);
-        }).catch(function(err) { onFailure && onFailure(err); });
+        }).catch(function() {
+          fetchJson('dashboard.json').then(function(data) {
+            if (data && data.ok === false) throw new Error(data.message || 'Static dashboard error');
+            onSuccess && onSuccess(data);
+          }).catch(function(err) { onFailure && onFailure(err); });
+        });
         return;
       }
       if (method === 'getSectionItems') {
@@ -111,6 +115,10 @@
           onSuccess && onSuccess({ ok: false, message: '비밀번호가 올바르지 않습니다.' });
           return;
         }
+        if (note.mdInline) {
+          onSuccess && onSuccess({ ok: true, markdown: note.mdInline });
+          return;
+        }
         var mdPath = note.mdPath || ('notes/' + noteKey + '.md');
         fetchText(mdPath).then(function(md) {
           onSuccess && onSuccess({ ok: true, markdown: md });
@@ -121,6 +129,183 @@
     } catch (err) {
       if (onFailure) onFailure(err);
     }
+  }
+
+  function loadStaticRaw() {
+    var targets = [
+      fetchJson('raw/profile.json'),
+      fetchJson('raw/courses.json'),
+      fetchJson('raw/projects.json'),
+      fetchJson('raw/exhibitions.json'),
+      fetchJson('raw/notes.json'),
+      fetchJson('raw/order.json')
+    ];
+    return Promise.all(targets).then(function(list) {
+      var rawProfile = list[0] || {};
+      var rawCourses = list[1] || {};
+      var rawProjects = list[2] || {};
+      var rawExhibitions = list[3] || {};
+      var rawNotes = list[4] || {};
+      var rawOrder = list[5] || {};
+
+      var profile = parseProfileRaw(rawProfile);
+      var courses = parseSectionRaw(rawCourses);
+      var projects = parseSectionRaw(rawProjects);
+      var exhibitions = parseSectionRaw(rawExhibitions);
+      var notes = parseNotesRaw(rawNotes);
+      var order = parseOrderRaw(rawOrder);
+
+      return {
+        ok: true,
+        profile: profile,
+        sectionOrder: order.length ? order : ['courses','exhibitions','projects','notes'],
+        courses: courses.active,
+        exhibitions: exhibitions.active,
+        projects: projects.active,
+        notes: notes.active
+      };
+    });
+  }
+
+  function normHeader(h) {
+    return String(h || '').toLowerCase().replace(/\s+/g, '');
+  }
+
+  function headerIndexMap(headers) {
+    var map = {};
+    for (var i = 0; i < headers.length; i++) {
+      map[normHeader(headers[i])] = i;
+    }
+    return map;
+  }
+
+  function pickRow(map, row, keys) {
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (map[key] !== undefined) return row[map[key]];
+    }
+    return '';
+  }
+
+  function truthy(val, fallback) {
+    if (val === '' || val == null) return fallback;
+    if (val === true) return true;
+    var s = String(val).toLowerCase().trim();
+    return s === 'true' || s === 't' || s === '1' || s === 'y' || s === 'yes' || s === 'o';
+  }
+
+  function makeKey(title, year, idx) {
+    var base = (title || 'item') + '-' + (year || '') + '-' + (idx + 1);
+    return base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  function sanitizeFileName(text) {
+    var raw = String(text || '').trim();
+    if (!raw) return 'note';
+    return raw.replace(/\s+/g, '-').replace(/[\\\/:*?"<>|]/g, '').trim() || 'note';
+  }
+
+  function parseProfileRaw(raw) {
+    var headers = raw.headers || [];
+    var rows = raw.rows || [];
+    var map = headerIndexMap(headers);
+    if (rows.length) {
+      var row = rows[0];
+      return {
+        name: pickRow(map, row, ['name','이름']) || '',
+        email: pickRow(map, row, ['email','메일']) || '',
+        instagram: pickRow(map, row, ['instagram','insta','ig','인스타','인스타그램','아이디','instagramid']) || '',
+        website: pickRow(map, row, ['website','웹사이트','site']) || ''
+      };
+    }
+    return { name: '', email: '', instagram: '', website: '' };
+  }
+
+  function parseSectionRaw(raw) {
+    var headers = raw.headers || [];
+    var rows = raw.rows || [];
+    var map = headerIndexMap(headers);
+    var all = [];
+    var active = [];
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var title = pickRow(map, row, ['title','제목']) || '';
+      if (!title) continue;
+      var year = pickRow(map, row, ['year','년도','날짜']) || '';
+      var code = pickRow(map, row, ['code','코드']) || '';
+      var location = pickRow(map, row, ['location','장소']) || '';
+      var link = pickRow(map, row, ['link','url','drive','drivelink','drivelink','drivelink','drivelink','링크','주소']) || '';
+      var pass = pickRow(map, row, ['pass','password','비밀번호']) || '';
+      var show = truthy(pickRow(map, row, ['show','노출']), true);
+      var publish = truthy(pickRow(map, row, ['publish','퍼블리시','게시']), true);
+      if (!publish) continue;
+      var item = {
+        itemKey: makeKey(title, year, i),
+        title: String(title),
+        year: String(year || ''),
+        code: String(code || ''),
+        location: String(location || ''),
+        link: String(link || ''),
+        hasDrive: !!link,
+        isDrive: /drive\.google\.com/.test(String(link)),
+        requiresPassword: !!pass,
+        pass: String(pass || '')
+      };
+      all.push(item);
+      if (show) active.push(item);
+    }
+    return { all: all, active: active };
+  }
+
+  function parseNotesRaw(raw) {
+    var headers = raw.headers || [];
+    var rows = raw.rows || [];
+    var map = headerIndexMap(headers);
+    var all = [];
+    var active = [];
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var title = pickRow(map, row, ['title','제목']) || '';
+      if (!title) continue;
+      var year = pickRow(map, row, ['year','날짜','date']) || '';
+      var text = pickRow(map, row, ['text','markdown','본문','마크다운문서','md']) || '';
+      var pass = pickRow(map, row, ['pass','password','비밀번호']) || '';
+      var show = truthy(pickRow(map, row, ['show','노출']), true);
+      var publish = truthy(pickRow(map, row, ['publish','퍼블리시','게시']), true);
+      if (!publish) continue;
+      var mdPath = '';
+      var mdInline = '';
+      if (text && /\\.md$/i.test(String(text)) || String(text).indexOf('notes/') === 0) {
+        mdPath = String(text);
+      } else if (String(text).indexOf('http') === 0) {
+        mdPath = String(text);
+      } else {
+        mdInline = String(text || '');
+        mdPath = 'notes/' + sanitizeFileName(title) + '.md';
+      }
+      var item = {
+        itemKey: makeKey(title, year, i),
+        title: String(title),
+        year: String(year || ''),
+        mdPath: mdPath,
+        mdInline: mdInline,
+        requiresPassword: !!pass,
+        pass: String(pass || '')
+      };
+      all.push(item);
+      if (show) active.push(item);
+    }
+    return { all: all, active: active };
+  }
+
+  function parseOrderRaw(raw) {
+    var rows = raw.rows || [];
+    var list = [];
+    for (var i = 0; i < rows.length; i++) {
+      var key = String((rows[i] && rows[i][0]) || '').trim().toLowerCase();
+      if (key) list.push(key);
+    }
+    return list;
   }
 
   /* ── UTILS ── */
