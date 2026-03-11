@@ -88,6 +88,11 @@
       }
       if (method === 'getSectionItems') {
         var sectionKey = (args && args[0]) || '';
+        var sec = _sections[sectionKey];
+        if (sec && Array.isArray(sec.all) && sec.all.length) {
+          onSuccess && onSuccess({ ok: true, items: sec.all });
+          return;
+        }
         fetchJson('sections/' + sectionKey + '.json').then(function(data) {
           onSuccess && onSuccess(data);
         }).catch(function(err) { onFailure && onFailure(err); });
@@ -103,7 +108,7 @@
           onSuccess && onSuccess({ ok: false, message: '비밀번호가 올바르지 않습니다.' });
           return;
         }
-        onSuccess && onSuccess({ ok: true, link: item.link || '' });
+        onSuccess && onSuccess({ ok: true, link: item.link || '', url: item.link || '' });
         return;
       }
       if (method === 'getProtectedNoteContent') {
@@ -162,8 +167,11 @@
         profile: profile,
         sectionOrder: order.length ? order : ['courses','exhibitions','projects','notes'],
         courses: courses.active,
+        coursesAll: courses.all,
         exhibitions: exhibitions.active,
+        exhibitionsAll: exhibitions.all,
         projects: projects.active,
+        projectsAll: projects.all,
         notes: notes.active
       };
     });
@@ -585,13 +593,13 @@
     var text = String(md || '');
     // Strip YAML front matter
     text = text.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-    // Normalize Drive image links
+    // Normalize Drive image links (public view URL)
     text = text.replace(/https:\/\/drive\.usercontent\.google\.com\/download\?id=([a-zA-Z0-9_-]+)[^\s)]*/g,
-      'https://lh3.googleusercontent.com/d/$1');
+      'https://drive.google.com/uc?export=view&id=$1');
     text = text.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view[^\s)]*/g,
-      'https://lh3.googleusercontent.com/d/$1');
+      'https://drive.google.com/uc?export=view&id=$1');
     text = text.replace(/https:\/\/drive\.google\.com\/uc\?export=view&id=([a-zA-Z0-9_-]+)[^\s)]*/g,
-      'https://lh3.googleusercontent.com/d/$1');
+      'https://drive.google.com/uc?export=view&id=$1');
     return text;
   }
 
@@ -1266,6 +1274,10 @@
         : getBaseList(key);
       var filtered = base.filter(function(item) { return matchesFilter(item, key); });
       renderSection(key, filtered, hasFilter ? 'No results found.' : null);
+      var sectionEl = document.getElementById('section-' + key);
+      if (sectionEl) {
+        sectionEl.style.display = (hasFilter && filtered.length === 0) ? 'none' : '';
+      }
     });
   }
 
@@ -1379,12 +1391,13 @@
 
     callBackend('getProtectedDriveLink', [_driveModalState.sectionKey, _driveModalState.itemKey, pw], function(res) {
         subEl.disabled = false;
-        if (!res || !res.ok || !res.url) {
+        var targetUrl = res ? (res.url || res.link || '') : '';
+        if (!res || !res.ok || !targetUrl) {
           errEl.textContent = (res && res.message) ? res.message : '접근할 수 없습니다.';
           if (_driveModalState.requiresPassword) pwEl.focus();
           return;
         }
-        var win = window.open(res.url, '_blank', 'noopener,noreferrer');
+        var win = window.open(targetUrl, '_blank', 'noopener,noreferrer');
         if (!win || win.closed || typeof win.closed === 'undefined') {
           errEl.textContent = '팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도하세요.';
           return;
@@ -1404,12 +1417,6 @@
     _sections.exhibitions.active = data.exhibitions    || [];
     _sections.projects.active    = data.projects       || [];
     _sections.notes.active       = data.notes          || [];
-    if (STATIC_MODE) {
-      indexStaticItems('courses', _sections.courses.active);
-      indexStaticItems('exhibitions', _sections.exhibitions.active);
-      indexStaticItems('projects', _sections.projects.active);
-      indexStaticItems('notes', _sections.notes.active);
-    }
     Object.keys(_sections).forEach(function(key) {
       _sections[key].all = [];
       _sections[key].allLoaded = false;
@@ -1417,6 +1424,22 @@
       _sections[key].pendingOpen = false;
       _sections[key].showingAll = false;
     });
+    if (STATIC_MODE) {
+      _sections.courses.all = data.coursesAll || _sections.courses.active;
+      _sections.exhibitions.all = data.exhibitionsAll || _sections.exhibitions.active;
+      _sections.projects.all = data.projectsAll || _sections.projects.active;
+      _sections.notes.all = _sections.notes.active;
+      Object.keys(_sections).forEach(function(key) { _sections[key].allLoaded = true; });
+      indexStaticItems('courses', _sections.courses.all);
+      indexStaticItems('exhibitions', _sections.exhibitions.all);
+      indexStaticItems('projects', _sections.projects.all);
+      indexStaticItems('notes', _sections.notes.all);
+    } else {
+      indexStaticItems('courses', _sections.courses.active);
+      indexStaticItems('exhibitions', _sections.exhibitions.active);
+      indexStaticItems('projects', _sections.projects.active);
+      indexStaticItems('notes', _sections.notes.active);
+    }
     applySectionOrder(data.sectionOrder || ['courses','exhibitions','projects','notes']);
     buildYearFilterOptions();
     applyFiltersAndRenderAll();
