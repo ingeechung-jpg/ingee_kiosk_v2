@@ -176,7 +176,8 @@
         exhibitionsAll: exhibitions.all,
         projects: projects.active,
         projectsAll: projects.all,
-        notes: notes.active
+        notes: notes.active,
+        notesAll: notes.all
       };
     });
   }
@@ -1434,7 +1435,7 @@
       _sections.courses.all = data.coursesAll || _sections.courses.active;
       _sections.exhibitions.all = data.exhibitionsAll || _sections.exhibitions.active;
       _sections.projects.all = data.projectsAll || _sections.projects.active;
-      _sections.notes.all = _sections.notes.active;
+      _sections.notes.all = data.notesAll || _sections.notes.active;
       Object.keys(_sections).forEach(function(key) { _sections[key].allLoaded = true; });
       indexStaticItems('courses', _sections.courses.all);
       indexStaticItems('exhibitions', _sections.exhibitions.all);
