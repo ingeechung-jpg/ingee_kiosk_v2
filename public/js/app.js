@@ -972,7 +972,7 @@
         var item = document.createElement('div');
         item.className = 'note-footnotes-bottom__item';
         var viewLabel = decodeFootnoteId(a.id);
-        item.innerHTML = '<span class="note-footnotes-bottom__num">[' + esc(viewLabel) + ']</span><span class="note-footnotes-bottom__text">' + esc(a.text) + '</span>';
+        item.innerHTML = '<span class="note-footnotes-bottom__num">[' + esc(viewLabel) + ']</span><span class="note-footnotes-bottom__text">' + formatFootnoteText(a.text) + '</span>';
         bottom.appendChild(item);
       });
       if (bottom.childElementCount) targetEl.appendChild(bottom);
@@ -1002,7 +1002,7 @@
       var item = document.createElement('div');
       item.className = 'note-sidenote' + (anchor.kind === 'caption' ? ' note-sidenote--caption' : '');
       var viewLabel = anchor.kind === 'caption' ? anchor.id : decodeFootnoteId(anchor.id);
-      item.innerHTML = '<span class="note-sidenote__num">[' + esc(viewLabel) + ']</span><span class="note-sidenote__text">' + esc(anchor.text) + '</span>';
+      item.innerHTML = '<span class="note-sidenote__num">[' + esc(viewLabel) + ']</span><span class="note-sidenote__text">' + formatFootnoteText(anchor.text) + '</span>';
       side.appendChild(item);
       items.push({ kind: anchor.kind, desiredTop: anchor.desiredTop, el: item });
     }
@@ -1029,6 +1029,19 @@
       }, { once: true });
       imgs[i].addEventListener('error', scheduleRelayoutOpenNoteFootnotes, { once: true });
     }
+  }
+
+  function formatFootnoteText(text) {
+    var t = String(text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Markdown link
+    t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function(_, label, url) {
+      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+    });
+    // Bare URL
+    t = t.replace(/(^|[^"'>])(https?:\/\/[^\s)]+)/g, function(_, prefix, url) {
+      return prefix + '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+    });
+    return t;
   }
 
   function relayoutOpenNoteFootnotes() {
