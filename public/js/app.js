@@ -1172,16 +1172,20 @@
 
     el.innerHTML = list.map(function(item) {
       var isTeaching = sectionKey === 'courses';
-      var hideCode = (sectionKey === 'exhibitions' || sectionKey === 'projects');
-      var yearText = String(item.year || '—');
+      var hideCode = (sectionKey === 'courses' || sectionKey === 'exhibitions' || sectionKey === 'projects');
+      var baseYear = String(item.year || '—');
+      var yearText = baseYear;
+      if (hideCode && isTeaching && item.code) {
+        yearText = baseYear + ' - ' + String(item.code);
+      }
       var yearHtml = esc(yearText);
-      if (!isTeaching && hideCode) {
+      if (hideCode) {
         var parts = yearText.split(/\s*-\s*/);
         if (parts.length >= 2) {
           var top = esc(parts[0]);
           var bottom = esc(parts.slice(1).join(' - '));
           yearHtml =
-            '<span class="year-part year-top">' + top + ' -</span>' +
+            '<span class="year-part year-top">' + top + '</span>' +
             '<span class="year-part year-bottom">' + bottom + '</span>';
         }
       }
