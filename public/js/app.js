@@ -1321,7 +1321,11 @@
 
   function matchesFilter(item, sectionKey) {
     if (_filters.section !== 'all' && _filters.section !== sectionKey) return false;
-    if (_filters.year !== 'all' && String(item.year || '') !== _filters.year) return false;
+    if (_filters.year !== 'all') {
+      var ystr = String(item.year || '');
+      var ys = ystr.match(/\b\d{4}\b/g) || [];
+      if (ys.indexOf(_filters.year) === -1) return false;
+    }
     if (!_filters.query) return true;
     return [item.title||'', item.code||'', item.location||'', item.year||''].join(' ').toLowerCase().indexOf(_filters.query) !== -1;
   }
@@ -1352,7 +1356,8 @@
       var list = section.allLoaded ? section.all : section.active;
       list.forEach(function(item) {
         var y = String(item.year || '').trim();
-        if (y) seen[y] = true;
+        var m = y.match(/\b(\d{4})\b/);
+        if (m) seen[m[1]] = true;
       });
     });
     var years = Object.keys(seen).sort(function(a,b) { return b.localeCompare(a, undefined, {numeric:true, sensitivity:'base'}); });
@@ -1369,7 +1374,14 @@
 
     qi.addEventListener('input', function() { _filters.query = (qi.value||'').trim().toLowerCase(); applyFiltersAndRenderAll(); });
     ys.addEventListener('change', function() { _filters.year = ys.value||'all'; applyFiltersAndRenderAll(); });
-    ss.addEventListener('change', function() { _filters.section = ss.value||'all'; applyFiltersAndRenderAll(); });
+    ss.addEventListener('change', function() {
+      _filters.section = ss.value||'all';
+      if (_filters.section !== 'all') {
+        var s = _sections[_filters.section];
+        if (s) { s.showingAll = true; }
+      }
+      applyFiltersAndRenderAll();
+    });
     rb.addEventListener('click', function() {
       _filters = {query:'', year:'all', section:'all'};
       qi.value=''; ys.value='all'; ss.value='all';

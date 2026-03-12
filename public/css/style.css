@@ -181,6 +181,16 @@
     white-space: nowrap;
   }
 
+  @media (max-width: 1000px) {
+    .filter-bar {
+      grid-template-columns: auto auto auto;
+      justify-content: end;
+    }
+    .filter-bar__input {
+      display: none;
+    }
+  }
+
   /* ── SECTIONS ── */
   .section--courses,
   .section--list {
