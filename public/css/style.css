@@ -1057,10 +1057,12 @@
     html { font-size: 1vw; }
   }
 /* Hide code for Exhibitions/Projects */
+#section-courses .course-row__code,
 #section-exhibitions .course-row__code,
 #section-projects .course-row__code {
   display: none;
 }
+#section-courses .course-row__year-code,
 #section-exhibitions .course-row__year-code,
 #section-projects .course-row__year-code {
   gap: 0;
