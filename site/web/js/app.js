@@ -1176,14 +1176,18 @@
       var baseYear = String(item.year || '—');
       var yearText = baseYear;
       if (hideCode && isTeaching && item.code) {
-        yearText = baseYear + ' - ' + String(item.code);
+        var codeText = String(item.code)
+          .replace(/\s*\/\s*/g, ' - ')
+          .replace(/\s*-\s*/g, ' - ');
+        yearText = baseYear + ' - ' + codeText;
       }
       var yearHtml = esc(yearText);
       if (hideCode) {
-        var parts = yearText.split(/\s*-\s*/);
-        if (parts.length >= 2) {
-          var top = esc(parts[0]);
-          var bottom = esc(parts.slice(1).join(' - '));
+        var m = yearText.match(/^\s*(.+?)\s*([–—-])\s*(.+)$/);
+        if (m) {
+          var dash = ' ' + m[2] + ' ';
+          var top = esc(m[1] + dash);
+          var bottom = esc(m[3]);
           yearHtml =
             '<span class="year-part year-top">' + top + '</span>' +
             '<span class="year-part year-bottom">' + bottom + '</span>';

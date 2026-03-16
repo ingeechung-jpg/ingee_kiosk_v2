@@ -1,14 +1,31 @@
-# ingee_kiosk
+# ingee_kiosk_V2
 
-Static site + publish pipeline.
+Raw-content sync pipeline.
 
 Structure:
-- public/      static site (HTML/CSS/JS)
-- data/        generated JSON/Markdown (published from Sheets/Docs)
-- scripts/     Apps Script publish tool
+- raw/
+  - docs/        raw Google Docs (.docx)
+  - sheets/      raw Google Sheets (.csv)
+- scripts/       conversion + Apps Script
+- site/web/      static site source
+- build/         generated outputs (not committed)
+- .content-index.json
 
 Workflow:
-1) Edit Google Sheets/Docs
-2) Run Apps Script `publishAll()`
-3) GitHub receives `data/` updates
-4) Static site reads `/data/*.json`
+1) Apps Script pushes raw files only:
+   - Docs -> raw/docs
+   - Sheets -> raw/sheets
+2) Run local build:
+   - `npm install`
+   - `npm run build:content`
+   - `npm run build:site`
+   - CI/CD: `npm run build:ci` (build site, then remove build/content)
+3) Build outputs:
+   - Markdown: build/content/*.md
+   - JSON: build/data/** (raw + sections + dashboard)
+4) Site build consumes build/content + build/data and deploys static site.
+
+Notes:
+- `raw/` is the single source of truth.
+- `.content-index.json` tracks hashes for incremental builds.
+- Generated files live only under `build/` and are not committed.

@@ -1,15 +1,15 @@
 /**
- * Publish Google Sheets/Docs to GitHub (static data)
- * 시트/독스 데이터를 GitHub로 배포하는 Publish 스크립트
+ * Publish raw Google Docs/Sheets to GitHub (no conversions).
  */
 
 const CONFIG = {
   SPREADSHEET_ID: '1US6hBNFQIpyEeFpQihP4j37z2_Z5f8mSsGfYOj9aWP4',
+  DOCS_FOLDER_ID: '1n-ogSyMLD4tScx8cNul0DFCLV4mbHp42',
   GITHUB_OWNER: 'ingeechung-jpg',
   GITHUB_REPO: 'ingee_kiosk',
   GITHUB_BRANCH: 'main',
   GITHUB_TOKEN: '',
-  BASE_PATH: 'public/data' // repo path
+  BASE_PATH: '' // repo root
 };
 
 const SECRET_SHEET_ID = '1MG9o_zfaZwjf8Ln7T125xdjt4Ku-D5moIvXFO90qLBs';
@@ -27,30 +27,60 @@ const SHEETS = {
 
 function publishAll() {
   ensureToken_();
-  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  // Raw exports (header + rows)
-  writeRawSheet_(ss, SHEETS.profile, 'raw/profile.json');
-  writeRawSheet_(ss, SHEETS.courses, 'raw/courses.json');
-  writeRawSheet_(ss, SHEETS.projects, 'raw/projects.json');
-  writeRawSheet_(ss, SHEETS.exhibitions, 'raw/exhibitions.json');
-  writeRawSheet_(ss, SHEETS.notes, 'raw/notes.json');
-  writeRawSheet_(ss, SHEETS.order, 'raw/order.json');
+  publishSheets_();
+  publishDocs_();
 }
 
-function writeRawSheet_(ss, sheetName, filePath) {
-  const sheet = ss.getSheetByName(sheetName);
-  if (!sheet) {
-    putJson_(filePath, { sheet: sheetName, headers: [], rows: [] });
-    return;
+function publishSheets_() {
+  if (!CONFIG.SPREADSHEET_ID) throw new Error('SPREADSHEET_ID is empty.');
+  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  const keys = Object.keys(SHEETS);
+  keys.forEach(key => {
+    const sheetName = SHEETS[key];
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) return;
+    const csv = sheetToCsv_(sheet);
+    const hash = hashString_(csv);
+    const cacheKey = 'sheet:' + sheetName;
+    if (isUnchanged_(cacheKey, hash)) return;
+    const fileName = sanitizeFileName_(sheetName) + '.csv';
+    putText_('raw/sheets/' + fileName, csv);
+    setHash_(cacheKey, hash);
+  });
+}
+
+function publishDocs_() {
+  if (!CONFIG.DOCS_FOLDER_ID) return;
+  const folder = DriveApp.getFolderById(CONFIG.DOCS_FOLDER_ID);
+  const files = folder.getFilesByType(MimeType.GOOGLE_DOCS);
+  while (files.hasNext()) {
+    const file = files.next();
+    const blob = file.getAs(MimeType.MICROSOFT_WORD);
+    const hash = hashBlob_(blob);
+    const cacheKey = 'doc:' + file.getId();
+    if (isUnchanged_(cacheKey, hash)) continue;
+    const name = sanitizeFileName_(file.getName()) + '.docx';
+    putBlob_('raw/docs/' + name, blob);
+    setHash_(cacheKey, hash);
   }
+}
+
+function sheetToCsv_(sheet) {
   const values = sheet.getDataRange().getValues();
-  if (!values || !values.length) {
-    putJson_(filePath, { sheet: sheetName, headers: [], rows: [] });
-    return;
-  }
-  const headers = values[0] || [];
-  const rows = values.slice(1);
-  putJson_(filePath, { sheet: sheetName, headers: headers, rows: rows });
+  return values.map(row => row.map(csvEscape_).join(',')).join('\n');
+}
+
+function csvEscape_(value) {
+  const text = String(value == null ? '' : value);
+  if (/[",\n]/.test(text)) return '"' + text.replace(/"/g, '""') + '"';
+  return text;
+}
+
+function sanitizeFileName_(name) {
+  return String(name || '')
+    .replace(/[\\\/:*?"<>|]/g, '')
+    .replace(/\s+/g, '-')
+    .trim() || 'file';
 }
 
 function ensureToken_() {
@@ -61,6 +91,7 @@ function ensureToken_() {
 }
 
 function getTokenFromSecretSheet_() {
+  if (!SECRET_SHEET_ID) return '';
   const ss = SpreadsheetApp.openById(SECRET_SHEET_ID);
   const sheet = ss.getSheetByName(SECRET_SHEET_NAME);
   if (!sheet) return '';
@@ -76,17 +107,47 @@ function getTokenFromSecretSheet_() {
   return '';
 }
 
-function putJson_(path, obj) {
-  putText_(path, JSON.stringify(obj, null, 2));
+function hashString_(text) {
+  const bytes = Utilities.newBlob(text).getBytes();
+  return digestHex_(bytes);
+}
+
+function hashBlob_(blob) {
+  return digestHex_(blob.getBytes());
+}
+
+function digestHex_(bytes) {
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, bytes);
+  return digest.map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
+}
+
+function isUnchanged_(key, hash) {
+  const props = PropertiesService.getScriptProperties();
+  const prev = props.getProperty('hash:' + key);
+  return prev && prev === hash;
+}
+
+function setHash_(key, hash) {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('hash:' + key, hash);
 }
 
 function putText_(path, content) {
-  const fullPath = CONFIG.BASE_PATH.replace(/\/$/, '') + '/' + path.replace(/^\//, '');
+  putContent_(path, Utilities.base64Encode(content, Utilities.Charset.UTF_8));
+}
+
+function putBlob_(path, blob) {
+  const bytes = blob.getBytes();
+  putContent_(path, Utilities.base64Encode(bytes));
+}
+
+function putContent_(path, base64Content) {
+  const fullPath = CONFIG.BASE_PATH ? CONFIG.BASE_PATH.replace(/\/$/, '') + '/' + path.replace(/^\//, '') : path;
   const url = 'https://api.github.com/repos/' + CONFIG.GITHUB_OWNER + '/' + CONFIG.GITHUB_REPO + '/contents/' + fullPath;
   const token = CONFIG.GITHUB_TOKEN;
   const payload = {
     message: 'publish: ' + fullPath,
-    content: Utilities.base64Encode(content, Utilities.Charset.UTF_8),
+    content: base64Content,
     branch: CONFIG.GITHUB_BRANCH
   };
 

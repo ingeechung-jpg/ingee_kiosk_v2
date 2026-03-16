@@ -1,0 +1,14 @@
+{
+  "name": "ingee_kiosk_v2",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build:content": "node scripts/build-content.js",
+    "build:site": "node scripts/build-site.js",
+    "build:ci": "node scripts/build-content.js && node scripts/build-site.js && node scripts/clean-content.js"
+  },
+  "dependencies": {
+    "mammoth": "^1.6.0",
+    "sharp": "^0.33.5"
+  }
+}

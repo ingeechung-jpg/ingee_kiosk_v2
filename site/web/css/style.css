@@ -12,7 +12,6 @@
     --content-gutter: 2.5rem;
     --date-col-width: 10ch; /* 0000.00.00 */
     --code-col-width: 12ch;
-    --grid-left: 17.5rem;
     --grid-gap: 0.6rem;
     --grid-gap-tight: 0.6rem;
   }
@@ -87,12 +86,19 @@
 
   .row {
     display: grid;
-    grid-template-columns: var(--grid-left) 1fr;
     align-items: baseline;
     gap: var(--grid-gap);
   }
 
   .row.profile__top { align-items: center; }
+
+  /* ── GRID SETUP ── */
+  .row,
+  .course-row,
+  .note-row,
+  .note-detail__row {
+    grid-template-columns: minmax(0, 0.35fr) minmax(0, 1fr);
+  }
 
   .profile__meta-row {
     padding: 0.5rem 0;
@@ -181,13 +187,18 @@
     white-space: nowrap;
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 1000px) and (min-width: 801px) {
     .filter-bar {
-      grid-template-columns: auto auto auto;
-      justify-content: end;
+      grid-template-columns: 1fr 1fr auto;
+      justify-content: stretch;
+      width: 100%;
     }
     .filter-bar__input {
       display: none;
+    }
+    .filter-bar__select {
+      width: 100%;
+      min-width: 0;
     }
   }
 
@@ -236,7 +247,6 @@
   padding: 0.7rem 0 0.65rem;
   border-bottom: 1px solid var(--line);
   display: grid;
-  grid-template-columns: var(--grid-left) 1fr;
   gap: var(--grid-gap-tight);
   align-items: center;
   cursor: pointer;
@@ -349,7 +359,6 @@
     background: transparent;
     color: inherit;
     display: grid;
-    grid-template-columns: var(--grid-left) 1fr;
     gap: var(--grid-gap);
     align-items: baseline;
     text-align: left;
@@ -402,7 +411,6 @@
 
   .note-detail__row {
     display: grid;
-    grid-template-columns: var(--grid-left) 1fr;
     gap: var(--grid-gap);
     align-items: start;
   }
@@ -1018,7 +1026,9 @@
     }
     .note-row__year {
       grid-area: year;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
       white-space: nowrap;
     }
     .note-row__title {
@@ -1093,9 +1103,10 @@
 .course-row__year .year-part { display: inline; }
 
 @media (max-width: 800px) {
+  #section-courses .course-row__year .year-part,
   #section-exhibitions .course-row__year .year-part,
   #section-projects .course-row__year .year-part {
     display: block;
-    line-height: 1.2;
+    line-height: 1.35;
   }
 }

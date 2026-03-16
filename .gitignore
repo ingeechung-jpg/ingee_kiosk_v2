@@ -2,5 +2,9 @@
 scripts/publish.local.gs
 scripts/*.token
 
+# build outputs
+build/
+node_modules/
+
 # system
 .DS_Store
