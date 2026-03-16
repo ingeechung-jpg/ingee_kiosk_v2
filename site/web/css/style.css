@@ -1089,17 +1089,23 @@
     :root { --content-max: 99999px; --content-gutter: 40px; }
     html { font-size: 1vw; }
   }
-/* Hide code for Teaching only */
-#section-courses .course-row__code {
+/* Hide code for Teaching/Exhibitions/Projects */
+#section-courses .course-row__code,
+#section-exhibitions .course-row__code,
+#section-projects .course-row__code {
   display: none;
 }
-#section-courses .course-row__year-code {
+#section-courses .course-row__year-code,
+#section-exhibitions .course-row__year-code,
+#section-projects .course-row__year-code {
   gap: 0;
 }
 .course-row__year .year-part { display: inline; }
 
 @media (max-width: 800px) {
-  #section-courses .course-row__year .year-part {
+  #section-courses .course-row__year .year-part,
+  #section-exhibitions .course-row__year .year-part,
+  #section-projects .course-row__year .year-part {
     display: block;
     line-height: 1.35;
   }
