@@ -54,6 +54,7 @@ function applyDocRules(markdown, context) {
   body = body.replace(/[ \t]+$/gm, '');
   body = body.replace(/\\([^\w\s])/g, '$1');
   body = body.replace(/\\\s/g, ' ');
+  body = body.replace(/\\([_*~`])/g, '$1');
   body = renumberOrderedLists(body);
   var frontMatter = buildFrontMatter(context);
   var text = (frontMatter + '\n\n' + body).trim();

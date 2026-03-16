@@ -700,6 +700,19 @@
     function inlineFormat(text) {
       var t = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+      // Protect inline code spans first
+      var codeSpans = [];
+      t = t.replace(/``([^`]+)``/g, function(_, code) {
+        var key = '@@CODE' + codeSpans.length + '@@';
+        codeSpans.push(code);
+        return key;
+      });
+      t = t.replace(/`([^`]+)`/g, function(_, code) {
+        var key = '@@CODE' + codeSpans.length + '@@';
+        codeSpans.push(code);
+        return key;
+      });
+
       // Links/images first (so URL protection doesn't break markdown links)
       t = t.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function(_, alt, url) {
         var src = resolveAssetUrl(url);
@@ -721,7 +734,11 @@
       t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       t = t.replace(/__([^_]+)__/g,     '<strong>$1</strong>');
       t = t.replace(/~~([^~]+)~~/g,     '<del>$1</del>');
-      t = t.replace(/`([^`]+)`/g,       '<code class="inline-code">$1</code>');
+      // Restore code spans
+      t = t.replace(/@@CODE(\d+)@@/g, function(_, idx) {
+        var code = codeSpans[Number(idx)] || '';
+        return '<code class="inline-code">' + esc(code) + '</code>';
+      });
       t = t.replace(/\*([^*]+)\*/g,     '<em>$1</em>');
       t = t.replace(/_([^_]+)_/g,       '<em>$1</em>');
 
