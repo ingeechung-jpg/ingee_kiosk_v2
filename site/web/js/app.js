@@ -1155,12 +1155,6 @@
       var hideCode = (sectionKey === 'courses' || sectionKey === 'exhibitions' || sectionKey === 'projects');
       var baseYear = String(item.year || '—');
       var yearText = baseYear;
-      if (hideCode && isTeaching && item.code) {
-        var codeText = String(item.code)
-          .replace(/\s*\/\s*/g, ' - ')
-          .replace(/\s*-\s*/g, ' - ');
-        yearText = baseYear + ' - ' + codeText;
-      }
       var yearHtml = esc(yearText);
       if (hideCode) {
         var m = yearText.match(/^\s*(.+?)\s*([–—-])\s*(.+)$/);
