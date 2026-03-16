@@ -906,7 +906,6 @@
     var label = detail.querySelector('.note-detail__label');
     var prose = targetEl.querySelector('.note-prose');
     if (!label || !prose) return;
-    var isMobile = window.matchMedia('(max-width: 800px)').matches;
     var oldBottom = targetEl.querySelector('.note-footnotes-bottom');
     if (oldBottom) oldBottom.remove();
 
@@ -959,25 +958,6 @@
       });
     }
     if (!anchors.length) return;
-
-    if (isMobile) {
-      var footnoteItems = anchors.filter(function(a) { return a.kind === 'footnote'; });
-      if (!footnoteItems.length) return;
-      var bottom = document.createElement('div');
-      bottom.className = 'note-footnotes-bottom';
-      var seenMobile = {};
-      footnoteItems.forEach(function(a) {
-        if (seenMobile[a.id]) return;
-        seenMobile[a.id] = true;
-        var item = document.createElement('div');
-        item.className = 'note-footnotes-bottom__item';
-        var viewLabel = decodeFootnoteId(a.id);
-        item.innerHTML = '<span class="note-footnotes-bottom__num">[' + esc(viewLabel) + ']</span><span class="note-footnotes-bottom__text">' + formatFootnoteText(a.text) + '</span>';
-        bottom.appendChild(item);
-      });
-      if (bottom.childElementCount) targetEl.appendChild(bottom);
-      return;
-    }
 
     var side = document.createElement('div');
     side.className = 'note-sidenotes';

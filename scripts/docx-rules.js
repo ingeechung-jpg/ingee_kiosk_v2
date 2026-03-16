@@ -23,11 +23,37 @@ function normalizeMarkdownForSheet(markdown) {
   return text;
 }
 
+function renumberOrderedLists(markdown) {
+  var lines = String(markdown || '').split('\n');
+  var inList = false;
+  var counter = 1;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var match = line.match(/^(\s*)\d+\.\s+(.*)$/);
+    if (match) {
+      if (!inList) { counter = 1; inList = true; }
+      lines[i] = match[1] + counter + '. ' + match[2];
+      counter += 1;
+      continue;
+    }
+    if (line.trim() === '') {
+      inList = false;
+      counter = 1;
+      continue;
+    }
+    inList = false;
+    counter = 1;
+  }
+  return lines.join('\n');
+}
+
 function applyDocRules(markdown, context) {
   var body = String(markdown || '');
   body = normalizeMarkdownForSheet(body);
   body = body.replace(/\r\n?/g, '\n');
   body = body.replace(/[ \t]+$/gm, '');
+  body = body.replace(/\\([.,!?;:])/g, '$1');
+  body = renumberOrderedLists(body);
   var frontMatter = buildFrontMatter(context);
   var text = (frontMatter + '\n\n' + body).trim();
   if (text && !text.endsWith('\n')) text += '\n';
