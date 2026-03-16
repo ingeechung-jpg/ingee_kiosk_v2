@@ -6,7 +6,7 @@ const CONFIG = {
   SPREADSHEET_ID: '1US6hBNFQIpyEeFpQihP4j37z2_Z5f8mSsGfYOj9aWP4',
   DOCS_FOLDER_ID: '1n-ogSyMLD4tScx8cNul0DFCLV4mbHp42',
   GITHUB_OWNER: 'ingeechung-jpg',
-  GITHUB_REPO: 'ingee_kiosk',
+  GITHUB_REPO: 'ingee_kiosk_v2',
   GITHUB_BRANCH: 'main',
   GITHUB_TOKEN: '',
   BASE_PATH: '' // repo root
@@ -55,7 +55,7 @@ function publishDocs_() {
   const files = folder.getFilesByType(MimeType.GOOGLE_DOCS);
   while (files.hasNext()) {
     const file = files.next();
-    const blob = file.getAs(MimeType.MICROSOFT_WORD);
+    const blob = exportDocx_(file.getId());
     const hash = hashBlob_(blob);
     const cacheKey = 'doc:' + file.getId();
     if (isUnchanged_(cacheKey, hash)) continue;
@@ -63,6 +63,26 @@ function publishDocs_() {
     putBlob_('raw/docs/' + name, blob);
     setHash_(cacheKey, hash);
   }
+}
+
+function exportDocx_(fileId) {
+  // Requires Advanced Drive API enabled (Drive v2)
+  try {
+    const blob = Drive.Files.export(fileId, MimeType.MICROSOFT_WORD);
+    if (blob) return blob;
+  } catch (_) {}
+  // Fallback: try direct URL export
+  const url = 'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(fileId) + '/export?mimeType=' + encodeURIComponent(MimeType.MICROSOFT_WORD);
+  const token = ScriptApp.getOAuthToken();
+  const res = UrlFetchApp.fetch(url, {
+    method: 'get',
+    headers: { Authorization: 'Bearer ' + token },
+    muteHttpExceptions: true
+  });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('Doc export failed: ' + res.getResponseCode() + ' ' + res.getContentText());
+  }
+  return res.getBlob().setName(fileId + '.docx');
 }
 
 function sheetToCsv_(sheet) {
