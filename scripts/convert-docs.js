@@ -17,19 +17,25 @@ function sanitizeFileName(text) {
     .trim() || 'note';
 }
 
-function writeImage(image, outDir, baseName, index) {
+function writeImage(image, outDir, baseName, index, opts) {
+  var options = opts || {};
   var fileName = baseName + '-img-' + index + '.webp';
   var imgDir = path.join(outDir, 'notes', 'img');
-  ensureDir(imgDir);
+  if (options.outputSubdir) {
+    imgDir = path.join(outDir, options.outputSubdir, 'img');
+  }
+  if (options.writeImages !== false) ensureDir(imgDir);
   return image.read('base64').then(function(base64) {
-    var outPath = path.join(imgDir, fileName);
     var buffer = Buffer.from(base64, 'base64');
     return sharp(buffer)
       .resize({ width: 1600, withoutEnlargement: true })
       .webp({ quality: 82 })
       .toBuffer()
       .then(function(outBuffer) {
-        fs.writeFileSync(outPath, outBuffer);
+        if (options.writeImages !== false) {
+          var outPath = path.join(imgDir, fileName);
+          fs.writeFileSync(outPath, outBuffer);
+        }
         return { src: 'notes/img/' + fileName };
       });
   });
@@ -43,7 +49,8 @@ async function convertDoc(inputPath, outputDir, opts) {
   var titleMap = options.titleMap || {};
   var mappedTitle = titleMap[baseName] || '';
   var outDir = path.resolve(outputDir);
-  var notesDir = path.join(outDir, 'notes');
+  var subdir = options.outputSubdir || 'notes';
+  var notesDir = path.join(outDir, subdir);
   var outPath = path.join(notesDir, safeBase + '.md');
   var imageIndex = 0;
   var stat = fs.statSync(absInput);
@@ -61,7 +68,7 @@ async function convertDoc(inputPath, outputDir, opts) {
     {
       convertImage: mammoth.images.inline(function(image) {
         imageIndex += 1;
-        return writeImage(image, outDir, safeBase, imageIndex);
+        return writeImage(image, outDir, safeBase, imageIndex, options);
       })
     }
   );

@@ -3,6 +3,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "build:raw-md": "node scripts/build-raw-md.js",
     "build:content": "node scripts/build-content.js",
     "build:site": "node scripts/build-site.js",
     "build:ci": "node scripts/build-content.js && node scripts/build-site.js && node scripts/clean-content.js"

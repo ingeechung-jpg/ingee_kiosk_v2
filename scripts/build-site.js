@@ -48,6 +48,7 @@ function buildSite() {
   removeDir(BUILD_SITE);
   copyDir(SITE_SRC, BUILD_SITE);
   copyDir(BUILD_DATA, path.join(BUILD_SITE, 'data'));
+  copyDir(path.join(ROOT, 'raw', 'md'), path.join(BUILD_SITE, 'data', 'raw', 'md'));
 
   if (fs.existsSync(BUILD_CONTENT)) {
     copyDir(BUILD_CONTENT, path.join(BUILD_SITE, 'data'));

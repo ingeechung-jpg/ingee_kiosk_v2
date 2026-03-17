@@ -1,0 +1,39 @@
+name: Build raw md
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "raw/docs/**"
+      - "raw/sheets/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate raw md
+        run: npm run build:raw-md
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git status --porcelain raw/md | grep -q .; then
+            git add raw/md
+            git commit -m "chore: update raw md [skip ci]"
+            git push
+          fi

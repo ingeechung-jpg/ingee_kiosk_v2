@@ -188,7 +188,7 @@ function parseNotesRaw(raw, opts) {
     var mdPath = '';
     var mdInline = '';
     if (docRef) {
-      mdPath = 'notes/' + sanitizeFileName(docRef) + '.md';
+      mdPath = 'raw/md/' + sanitizeFileName(docRef) + '.md';
     } else if ((text && /\.md$/i.test(String(text))) || String(text).indexOf('notes/') === 0) {
       mdPath = String(text);
     } else if (String(text).indexOf('http') === 0) {
