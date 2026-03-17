@@ -55,10 +55,21 @@ function publishDocs_() {
   const files = folder.getFilesByType(MimeType.GOOGLE_DOCS);
   while (files.hasNext()) {
     const file = files.next();
-    const blob = exportDocx_(file.getId());
-    const hash = hashBlob_(blob);
+    const updated = file.getLastUpdated();
+    let textHash = '';
+    try {
+      const doc = DocumentApp.openById(file.getId());
+      const text = doc.getBody().getText() || '';
+      textHash = hashString_(text);
+    } catch (err) {
+      Logger.log('Failed to read doc text: ' + file.getId() + ' ' + err);
+      textHash = '';
+    }
+    const stamp = updated ? updated.getTime() : 0;
+    const hash = hashString_(stamp + '::' + textHash);
     const cacheKey = 'doc:' + file.getId();
     if (isUnchanged_(cacheKey, hash)) continue;
+    const blob = exportDocx_(file.getId());
     const name = file.getId() + '.docx';
     putBlob_('raw/docs/' + name, blob);
     setHash_(cacheKey, hash);

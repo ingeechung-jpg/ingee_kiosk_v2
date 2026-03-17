@@ -690,6 +690,17 @@
     function flushCodeBlock() {
       if (!inCodeBlock) return;
       var isMermaid = codeLang && codeLang.toLowerCase() === 'mermaid';
+      if (!isMermaid && (!codeLang || codeLang.toLowerCase() === 'text')) {
+        for (var i = 0; i < codeLines.length; i++) {
+          var line = String(codeLines[i]).trim();
+          if (!line) continue;
+          if (line.toLowerCase() === 'mermaid') {
+            isMermaid = true;
+            codeLines = codeLines.slice(i + 1);
+          }
+          break;
+        }
+      }
       var cls = isMermaid ? 'note-code note-code--mermaid' : 'note-code';
       var dataAttr = isMermaid ? ' data-mermaid="1"' : '';
       html += '<pre class="' + cls + '"' + dataAttr + '><code>' + esc(codeLines.join('\n')) + '</code></pre>\n';
