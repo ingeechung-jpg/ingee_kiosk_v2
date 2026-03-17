@@ -10,9 +10,7 @@ pass: ""
 
 
 
-```
-
-mermaid
+```mermaid
 
 flowchart LR
 
@@ -56,9 +54,7 @@ flowchart LR
 
 ```
 
-```
-
-mermaid
+```mermaid
 
 flowchart LR
 
