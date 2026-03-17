@@ -35,5 +35,6 @@ jobs:
           if git status --porcelain raw/md | grep -q .; then
             git add raw/md
             git commit -m "chore: update raw md [skip ci]"
+            git pull --rebase
             git push
           fi
