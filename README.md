@@ -29,3 +29,10 @@ Notes:
 - `raw/` is the single source of truth.
 - `.content-index.json` tracks hashes for incremental builds.
 - Generated files live only under `build/` and are not committed.
+
+CI/CD (GitHub Actions -> Cloudflare Pages):
+- Set GitHub secrets:
+  - `CF_PAGES_API_TOKEN`
+  - `CF_ACCOUNT_ID`
+  - `CF_PAGES_PROJECT`
+- Workflow: `.github/workflows/pages-deploy.yml`
