@@ -101,6 +101,17 @@ function sanitizeFileName(text) {
   return raw.replace(/\s+/g, '-').replace(/[\\\/:*?"<>|]/g, '').trim() || 'note';
 }
 
+function extractDocId(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+  var m = raw.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  m = raw.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  if (/^[a-zA-Z0-9_-]{10,}$/.test(raw)) return raw;
+  return raw;
+}
+
 function parseProfileRaw(raw) {
   var headers = raw.headers || [];
   var rows = raw.rows || [];
@@ -153,7 +164,9 @@ function parseSectionRaw(raw, sectionKey) {
   return { all: all, active: active };
 }
 
-function parseNotesRaw(raw) {
+function parseNotesRaw(raw, opts) {
+  var options = opts || {};
+  var docIdToTitle = options.docIdToTitle || {};
   var headers = raw.headers || [];
   var rows = raw.rows || [];
   var map = headerIndexMap(headers);
@@ -165,7 +178,8 @@ function parseNotesRaw(raw) {
     if (!title) continue;
     var year = pickRow(map, row, ['year','날짜','date']) || '';
     var text = pickRow(map, row, ['text','markdown','본문','마크다운문서','md']) || '';
-    var docRef = pickRow(map, row, ['doc','document','gdoc','gdocs','문서','독스','docname','docid']) || '';
+    var docRefRaw = pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '';
+    var docRef = extractDocId(docRefRaw);
     var pass = pickRow(map, row, ['pass','password','비밀번호']) || '';
     var show = truthy(pickRow(map, row, ['show','노출']), true);
     var publish = truthy(pickRow(map, row, ['publish','퍼블리시','게시']), true);
@@ -173,14 +187,14 @@ function parseNotesRaw(raw) {
 
     var mdPath = '';
     var mdInline = '';
-    if ((text && /\.md$/i.test(String(text))) || String(text).indexOf('notes/') === 0) {
+    if (docRef) {
+      mdPath = 'notes/' + sanitizeFileName(docRef) + '.md';
+    } else if ((text && /\.md$/i.test(String(text))) || String(text).indexOf('notes/') === 0) {
       mdPath = String(text);
     } else if (String(text).indexOf('http') === 0) {
       mdPath = String(text);
     } else if (String(text).indexOf('docs.google.com') !== -1) {
       mdPath = 'notes/' + sanitizeFileName(title) + '.md';
-    } else if (docRef) {
-      mdPath = 'notes/' + sanitizeFileName(docRef) + '.md';
     } else {
       mdInline = String(text || '');
       mdPath = 'notes/' + sanitizeFileName(title) + '.md';
@@ -199,6 +213,23 @@ function parseNotesRaw(raw) {
     if (show) active.push(item);
   }
   return { all: all, active: active };
+}
+
+function buildNoteDocTitleMap(raw) {
+  var headers = raw.headers || [];
+  var rows = raw.rows || [];
+  var map = headerIndexMap(headers);
+  var out = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var title = pickRow(map, row, ['title','제목']) || '';
+    var docRefRaw = pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '';
+    var docRef = extractDocId(docRefRaw);
+    if (docRef && title) {
+      out[String(docRef).trim()] = String(title).trim();
+    }
+  }
+  return out;
 }
 
 function parseOrderRaw(raw) {
@@ -286,7 +317,8 @@ function convertSheetsDir(rawSheetsDir, outputDir) {
   var courses = parseSectionRaw(rawMap.courses || { headers: [], rows: [] }, 'courses');
   var projects = parseSectionRaw(rawMap.projects || { headers: [], rows: [] }, 'projects');
   var exhibitions = parseSectionRaw(rawMap.exhibitions || { headers: [], rows: [] }, 'exhibitions');
-  var notes = parseNotesRaw(rawMap.notes || { headers: [], rows: [] });
+  var noteTitleMap = buildNoteDocTitleMap(rawMap.notes || { headers: [], rows: [] });
+  var notes = parseNotesRaw(rawMap.notes || { headers: [], rows: [] }, { docIdToTitle: noteTitleMap });
   var order = parseOrderRaw(rawMap.order || { headers: [], rows: [] });
   if (!order.length) order = ['courses','exhibitions','projects','notes'];
 

@@ -35,10 +35,13 @@ function writeImage(image, outDir, baseName, index) {
   });
 }
 
-async function convertDoc(inputPath, outputDir) {
+async function convertDoc(inputPath, outputDir, opts) {
   var absInput = path.resolve(inputPath);
   var baseName = path.basename(absInput, path.extname(absInput));
   var safeBase = sanitizeFileName(baseName);
+  var options = opts || {};
+  var titleMap = options.titleMap || {};
+  var mappedTitle = titleMap[baseName] || '';
   var outDir = path.resolve(outputDir);
   var notesDir = path.join(outDir, 'notes');
   var outPath = path.join(notesDir, safeBase + '.md');
@@ -67,7 +70,7 @@ async function convertDoc(inputPath, outputDir) {
     inputPath: absInput,
     outputPath: outPath,
     baseName: safeBase,
-    title: baseName,
+    title: mappedTitle || baseName,
     date: date
   });
 

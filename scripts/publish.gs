@@ -59,7 +59,7 @@ function publishDocs_() {
     const hash = hashBlob_(blob);
     const cacheKey = 'doc:' + file.getId();
     if (isUnchanged_(cacheKey, hash)) continue;
-    const name = sanitizeFileName_(file.getName()) + '.docx';
+    const name = file.getId() + '.docx';
     putBlob_('raw/docs/' + name, blob);
     setHash_(cacheKey, hash);
   }
