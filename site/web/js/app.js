@@ -128,7 +128,7 @@
           onSuccess && onSuccess({ ok: true, markdown: note.mdInline });
           return;
         }
-        var mdPath = note.mdPath || ('notes/' + noteKey + '.md');
+        var mdPath = note.mdPath || ('raw/md/' + noteKey + '.md');
         fetchText(mdPath).then(function(md) {
           onSuccess && onSuccess({ ok: true, markdown: md });
         }).catch(function(err) { onFailure && onFailure(err); });
@@ -274,6 +274,17 @@
     return { all: all, active: active, missingLinks: missingLinks };
   }
 
+  function extractDocId(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var m = raw.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+    if (m) return m[1];
+    m = raw.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if (m) return m[1];
+    if (/^[a-zA-Z0-9_-]{10,}$/.test(raw)) return raw;
+    return raw;
+  }
+
   function parseNotesRaw(raw) {
     var headers = raw.headers || [];
     var rows = raw.rows || [];
@@ -286,19 +297,23 @@
       if (!title) continue;
       var year = pickRow(map, row, ['year','날짜','date']) || '';
       var text = pickRow(map, row, ['text','markdown','본문','마크다운문서','md']) || '';
+      var docRefRaw = pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '';
+      var docRef = extractDocId(docRefRaw);
       var pass = pickRow(map, row, ['pass','password','비밀번호']) || '';
       var show = truthy(pickRow(map, row, ['show','노출']), true);
       var publish = truthy(pickRow(map, row, ['publish','퍼블리시','게시']), true);
       if (!publish) continue;
       var mdPath = '';
       var mdInline = '';
-      if (text && /\\.md$/i.test(String(text)) || String(text).indexOf('notes/') === 0) {
+      if (docRef) {
+        mdPath = 'raw/md/' + sanitizeFileName(docRef) + '.md';
+      } else if ((text && /\\.md$/i.test(String(text))) || String(text).indexOf('raw/md/') === 0 || String(text).indexOf('notes/') === 0) {
         mdPath = String(text);
       } else if (String(text).indexOf('http') === 0) {
         mdPath = String(text);
       } else {
         mdInline = String(text || '');
-        mdPath = 'notes/' + sanitizeFileName(title) + '.md';
+        mdPath = 'raw/md/' + sanitizeFileName(title) + '.md';
       }
       var item = {
         itemKey: makeKey(title, year, i),
