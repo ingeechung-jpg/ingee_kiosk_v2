@@ -1079,7 +1079,32 @@
   function initMermaid() {
     if (!window.mermaid) return;
     try {
-      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+      window.mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'loose',
+        theme: 'base',
+        themeVariables: {
+          fontFamily: 'Pretendard, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+          primaryColor: '#f6f8fa',
+          primaryTextColor: '#24292f',
+          primaryBorderColor: '#d0d7de',
+          lineColor: '#57606a',
+          secondaryColor: '#ffffff',
+          tertiaryColor: '#f6f8fa',
+          background: '#ffffff',
+          mainBkg: '#ffffff',
+          nodeBorder: '#d0d7de',
+          clusterBkg: '#f6f8fa',
+          clusterBorder: '#d0d7de',
+          edgeLabelBackground: '#ffffff',
+          titleColor: '#24292f',
+          textColor: '#24292f',
+          actorBorder: '#d0d7de',
+          actorBkg: '#ffffff',
+          noteBorderColor: '#d0d7de',
+          noteBkgColor: '#fff8c5'
+        }
+      });
     } catch (_) {}
   }
 
