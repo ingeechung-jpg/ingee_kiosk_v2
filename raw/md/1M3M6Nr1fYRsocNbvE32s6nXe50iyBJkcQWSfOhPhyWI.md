@@ -58,49 +58,55 @@ flowchart LR
 
 flowchart LR
 
-   subgraph GDRIVE["구글드라이브"]
+  subgraph GDRIVE["구글드라이브"]
 
-        subgraph DATA
+       subgraph DATA
 
-            DOC[구글독스 게시글]
+           DOC[구글독스 게시글]
 
-            GDATA[구글 데이터]
+           GDATA[구글 데이터]
 
-        end
+       end
 
-        subgraph APP_SCRIPT
+       subgraph APP_SCRIPT
 
-            MDPROC[마크다운변환]
+           DATAPROC[데이터만 깃에 전송]
 
-            DATAPROC[데이터만 깃에 전송]
+       end
 
-        end
+       DOC --> DATAPROC
 
-        DOC --> MDPROC
+       GDATA --> DATAPROC
 
-        GDATA --> DATAPROC
+   end
 
-    end
+   subgraph GIT["Git"]
 
-    subgraph GIT["Git"]
+         subgraph Raw Data
 
-        subgraph HTML
+          MD[마크다운 변환]
 
-            APP[App]
+           JSON[json 변환]
 
-            MD[.md]
+       end
 
-            JSON[.json]
+       subgraph HTML
 
-        end
+        app[Build]
 
-    end
+       end
 
-    MDPROC --> MD
+   end
 
-    DATAPROC --> JSON
+   DATAPROC --> MD
 
-    GDRIVE -- 속도 빠름 --> GIT
+   DATAPROC --> JSON
+
+   MD --> app
+
+   JSON --> app
+
+   GDRIVE -- 속도 빠름 --> GIT
 
 ```
 
