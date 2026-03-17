@@ -1050,6 +1050,29 @@
     }
   }
 
+  function initMermaid() {
+    if (!window.mermaid) return;
+    try {
+      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+    } catch (_) {}
+  }
+
+  function renderMermaidBlocks(scopeEl) {
+    if (!window.mermaid || !scopeEl) return;
+    var blocks = scopeEl.querySelectorAll('pre[data-mermaid]');
+    for (var i = 0; i < blocks.length; i++) {
+      var pre = blocks[i];
+      if (pre.getAttribute('data-rendered') === '1') continue;
+      var codeEl = pre.querySelector('code');
+      var code = codeEl ? codeEl.textContent : pre.textContent;
+      var container = document.createElement('div');
+      container.className = 'mermaid';
+      container.textContent = code || '';
+      pre.parentNode.replaceChild(container, pre);
+      try { window.mermaid.init(undefined, container); } catch (_) {}
+    }
+  }
+
   function loadNoteContent(itemKey, password, targetEl) {
     callBackend('getProtectedNoteContent', [itemKey, password || ''], function(res) {
         if (!res || !res.ok || !res.markdown) {
@@ -1060,6 +1083,7 @@
         targetEl.innerHTML = '<div class="note-prose">' + rendered.html + '</div>';
         targetEl.setAttribute('data-note-footnotes', JSON.stringify(rendered.footnotes || {}));
         layoutNoteFootnotes(targetEl, rendered.footnotes || {});
+        renderMermaidBlocks(targetEl);
         bindNoteMediaRelayout(targetEl);
       }, function(err) {
         targetEl.innerHTML = '<span style="color:#c00">' + esc('오류: ' + (err && err.message ? err.message : String(err))) + '</span>';
@@ -1535,6 +1559,7 @@
   window.addEventListener('load', function() {
     initWebGLBackground();
     initCalendarPopupToggle();
+    initMermaid();
     initCourseRowClicks();
     initNoteRowClicks();
     initFilters();
