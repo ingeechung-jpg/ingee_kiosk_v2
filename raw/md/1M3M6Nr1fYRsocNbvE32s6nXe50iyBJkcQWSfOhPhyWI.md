@@ -8,4 +8,104 @@ pass: ""
 
 키오스크 데이터 구조를 변경했다. 초기 버전은 __앱스크립트__에서 시트와 문서의 데이터를 불러와서 웹사이트의 구조적 빌딩까지 모두 처리했었다. HTML 로딩 시 매번 API가 데이터를 읽고 구조를 잡다 보니 로딩 속도가 느려져서 구조를 바꾸기로 했다. __문서__와 __시트__의 원본을 Git에 올리고, Git에서 __JSON__, __MD__ 파일 변환과 웹 빌딩까지 처리하니 속도도 빨라지고 관리도 편리하다. AI를 사용하니 알지 못했던 다른 전문 분야의 구조에도 관심이 가고 배우기도 좋다. 이전에는 디자인에서 스타일이나 기능성 정도를 생각했지만 데이터 크롤링 속도나 데이터 관리 구조도 생각하게 되고 맞춤형 CMS 만들기도 괜찮을 것 같다.
 
+
+
+```
+
+mermaid
+
+flowchart LR
+
+    subgraph GDRIVE[구글드라이브]
+
+        subgraph DATA
+
+            CRAWL[구글독스; 게시글]
+
+            GSHEET[구글; 데이터]
+
+        end
+
+        subgraph APP_SCRIPT
+
+            APPSCRIPT[마크다운변환]
+
+            API[데이터구조화]
+
+        end
+
+        CRAWL --> APPSCRIPT
+
+        GSHEET --> API
+
+    end
+
+    subgraph GIT
+
+        HTML[HTML]
+
+    end
+
+    APPSCRIPT <--> HTML
+
+    API <--> HTML
+
+    SLOW[속도 느림]
+
+    GDRIVE --- SLOW --- GIT
+
+```
+
+```
+
+mermaid
+
+flowchart LR
+
+   subgraph GDRIVE["구글드라이브"]
+
+        subgraph DATA
+
+            DOC[구글독스 게시글]
+
+            GDATA[구글 데이터]
+
+        end
+
+        subgraph APP_SCRIPT
+
+            MDPROC[마크다운변환]
+
+            DATAPROC[데이터만 깃에 전송]
+
+        end
+
+        DOC --> MDPROC
+
+        GDATA --> DATAPROC
+
+    end
+
+    subgraph GIT["Git"]
+
+        subgraph HTML
+
+            APP[App]
+
+            MD[.md]
+
+            JSON[.json]
+
+        end
+
+    end
+
+    MDPROC --> MD
+
+    DATAPROC --> JSON
+
+    GDRIVE -- 속도 빠름 --> GIT
+
+```
+
   2026.03.17
