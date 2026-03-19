@@ -143,10 +143,6 @@ function hashString_(text) {
   return digestHex_(bytes);
 }
 
-function hashBlob_(blob) {
-  return digestHex_(blob.getBytes());
-}
-
 function digestHex_(bytes) {
   const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, bytes);
   return digest.map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');

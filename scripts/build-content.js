@@ -129,6 +129,17 @@ function pickRow(map, row, keys) {
   return '';
 }
 
+function extractDocId(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+  var m = raw.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  m = raw.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  if (/^[a-zA-Z0-9_-]{10,}$/.test(raw)) return raw;
+  return raw;
+}
+
 function loadNotesTitleMap() {
   var files = listFiles(RAW_SHEETS, '.csv');
   var noteFile = null;
@@ -148,7 +159,7 @@ function loadNotesTitleMap() {
   for (var r = 1; r < rows.length; r++) {
     var row = rows[r];
     var title = pickRow(map, row, ['title','제목']) || '';
-    var docRef = pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '';
+    var docRef = extractDocId(pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '');
     if (docRef && title) {
       out[String(docRef).trim()] = String(title).trim();
     }
@@ -198,7 +209,7 @@ async function run() {
     removedKeys.forEach(function(key) {
       if (key.indexOf('raw/docs/') === 0 && key.toLowerCase().endsWith('.docx')) {
         var base = path.basename(key, '.docx') + '.md';
-        removeFile(path.join(BUILD_CONTENT, base));
+        removeFile(path.join(BUILD_CONTENT, 'notes', base));
       }
     });
   }

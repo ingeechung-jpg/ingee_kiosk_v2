@@ -13,7 +13,10 @@ This script exports raw Google Docs/Sheets to GitHub. No Markdown/JSON conversio
 ## Output
 - Docs: `raw/docs/*.docx`
 - Sheets: `raw/sheets/*.csv`
-  - CSV names follow sheet names (e.g. `Profile` -> `profile.csv`).
+  - CSV names follow sheet names.
+- Generated markdown: `raw/md/*.md`
 
 ## Incremental
 The script stores hashes in Script Properties and only uploads when content changes.
+- Sheets are compared by CSV hash.
+- Docs are compared by `lastUpdated` + document text hash before exporting `.docx`.

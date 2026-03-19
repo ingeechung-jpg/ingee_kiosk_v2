@@ -128,7 +128,7 @@ function parseProfileRaw(raw) {
   return { name: '', email: '', instagram: '', website: '' };
 }
 
-function parseSectionRaw(raw, sectionKey) {
+function parseSectionRaw(raw) {
   var headers = raw.headers || [];
   var rows = raw.rows || [];
   var map = headerIndexMap(headers);
@@ -164,9 +164,7 @@ function parseSectionRaw(raw, sectionKey) {
   return { all: all, active: active };
 }
 
-function parseNotesRaw(raw, opts) {
-  var options = opts || {};
-  var docIdToTitle = options.docIdToTitle || {};
+function parseNotesRaw(raw) {
   var headers = raw.headers || [];
   var rows = raw.rows || [];
   var map = headerIndexMap(headers);
@@ -189,15 +187,13 @@ function parseNotesRaw(raw, opts) {
     var mdInline = '';
     if (docRef) {
       mdPath = 'raw/md/' + sanitizeFileName(docRef) + '.md';
-    } else if ((text && /\.md$/i.test(String(text))) || String(text).indexOf('notes/') === 0) {
+    } else if ((text && /\.md$/i.test(String(text))) || String(text).indexOf('raw/md/') === 0) {
       mdPath = String(text);
     } else if (String(text).indexOf('http') === 0) {
       mdPath = String(text);
-    } else if (String(text).indexOf('docs.google.com') !== -1) {
-      mdPath = 'notes/' + sanitizeFileName(title) + '.md';
     } else {
       mdInline = String(text || '');
-      mdPath = 'notes/' + sanitizeFileName(title) + '.md';
+      mdPath = 'raw/md/' + sanitizeFileName(title) + '.md';
     }
 
     var item = {
@@ -213,23 +209,6 @@ function parseNotesRaw(raw, opts) {
     if (show) active.push(item);
   }
   return { all: all, active: active };
-}
-
-function buildNoteDocTitleMap(raw) {
-  var headers = raw.headers || [];
-  var rows = raw.rows || [];
-  var map = headerIndexMap(headers);
-  var out = {};
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    var title = pickRow(map, row, ['title','제목']) || '';
-    var docRefRaw = pickRow(map, row, ['docid','doc_id','doc','document','gdoc','gdocs','문서','독스','docname']) || '';
-    var docRef = extractDocId(docRefRaw);
-    if (docRef && title) {
-      out[String(docRef).trim()] = String(title).trim();
-    }
-  }
-  return out;
 }
 
 function parseOrderRaw(raw) {
@@ -314,11 +293,10 @@ function convertSheetsDir(rawSheetsDir, outputDir) {
   });
 
   var profile = parseProfileRaw(rawMap.profile || { headers: [], rows: [] });
-  var courses = parseSectionRaw(rawMap.courses || { headers: [], rows: [] }, 'courses');
-  var projects = parseSectionRaw(rawMap.projects || { headers: [], rows: [] }, 'projects');
-  var exhibitions = parseSectionRaw(rawMap.exhibitions || { headers: [], rows: [] }, 'exhibitions');
-  var noteTitleMap = buildNoteDocTitleMap(rawMap.notes || { headers: [], rows: [] });
-  var notes = parseNotesRaw(rawMap.notes || { headers: [], rows: [] }, { docIdToTitle: noteTitleMap });
+  var courses = parseSectionRaw(rawMap.courses || { headers: [], rows: [] });
+  var projects = parseSectionRaw(rawMap.projects || { headers: [], rows: [] });
+  var exhibitions = parseSectionRaw(rawMap.exhibitions || { headers: [], rows: [] });
+  var notes = parseNotesRaw(rawMap.notes || { headers: [], rows: [] });
   var order = parseOrderRaw(rawMap.order || { headers: [], rows: [] });
   if (!order.length) order = ['courses','exhibitions','projects','notes'];
 

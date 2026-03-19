@@ -1,38 +1,28 @@
 # ingee_kiosk_V2
 
-Raw-content sync pipeline.
+Raw-content sync pipeline for the kiosk site.
 
 Structure:
-- raw/
-  - docs/        raw Google Docs (.docx)
-  - sheets/      raw Google Sheets (.csv)
-- scripts/       conversion + Apps Script
-- site/web/      static site source
-- build/         generated outputs (not committed)
-- .content-index.json
+- `raw/docs` -> exported Google Docs as `.docx`
+- `raw/sheets` -> exported Google Sheets as `.csv`
+- `raw/md` -> committed note markdown generated from `raw/docs`
+- `scripts` -> conversion scripts and Apps Script source
+- `site/web` -> static site source
+- `build` -> local build output only
+- `.content-index.json` -> incremental build hashes
 
 Workflow:
-1) Apps Script pushes raw files only:
-   - Docs -> raw/docs
-   - Sheets -> raw/sheets
-2) Run local build:
+1. Apps Script pushes raw files only:
+   - Docs -> `raw/docs`
+   - Sheets -> `raw/sheets`
+2. GitHub Action regenerates `raw/md` when `raw/docs` or `raw/sheets` changes.
+3. Local or CI build runs:
    - `npm install`
-   - `npm run build:content`
-   - `npm run build:site`
-   - CI/CD: `npm run build:ci` (build site, then remove build/content)
-3) Build outputs:
-   - Markdown: build/content/*.md
-   - JSON: build/data/** (raw + sections + dashboard)
-4) Site build consumes build/content + build/data and deploys static site.
+   - `npm run build:ci`
+4. Site reads JSON from `build/site/data/raw/*.json` and note markdown from `build/site/data/raw/md/*.md`.
 
 Notes:
-- `raw/` is the single source of truth.
-- `.content-index.json` tracks hashes for incremental builds.
-- Generated files live only under `build/` and are not committed.
-
-CI/CD (GitHub Actions -> Cloudflare Pages):
-- Set GitHub secrets:
-  - `CF_PAGES_API_TOKEN`
-  - `CF_ACCOUNT_ID`
-  - `CF_PAGES_PROJECT`
-- Workflow: `.github/workflows/pages-deploy.yml`
+- `raw/` is the source of truth.
+- `build/` is disposable and not committed.
+- `raw/md` is committed because the static site reads markdown directly.
+- Cloudflare deploy workflow was removed; only the raw markdown workflow remains.
