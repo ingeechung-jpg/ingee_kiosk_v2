@@ -25,4 +25,5 @@ Notes:
 - `raw/` is the source of truth.
 - `build/` is disposable and not committed.
 - `raw/md` is committed because the static site reads markdown directly.
+- No derived `dashboard.json` or `sections/*.json` files are generated anymore.
 - Cloudflare deploy workflow was removed; only the raw markdown workflow remains.

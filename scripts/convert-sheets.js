@@ -159,10 +159,6 @@ function convertSheetsDir(rawSheetsDir, outputDir) {
   var absRaw = path.resolve(rawSheetsDir);
   var absOut = path.resolve(outputDir);
   removeDir(path.join(absOut, 'raw'));
-  removeDir(path.join(absOut, 'sections'));
-  if (fs.existsSync(path.join(absOut, 'dashboard.json'))) {
-    fs.unlinkSync(path.join(absOut, 'dashboard.json'));
-  }
   var files = fs.readdirSync(absRaw).filter(function(name) { return /\.csv$/i.test(name); });
 
   var rawMap = {};
@@ -197,21 +193,6 @@ function convertSheetsDir(rawSheetsDir, outputDir) {
   var notes = parseNotesRaw(rawMap.notes || { headers: [], rows: [] });
   var order = parseOrderRaw(rawMap.order || { headers: [], rows: [] });
   if (!order.length) order = ['courses','exhibitions','projects','notes'];
-
-  writeJson(path.join(absOut, 'sections', 'courses.json'), { ok: true, items: courses.all });
-  writeJson(path.join(absOut, 'sections', 'projects.json'), { ok: true, items: projects.all });
-  writeJson(path.join(absOut, 'sections', 'exhibitions.json'), { ok: true, items: exhibitions.all });
-  writeJson(path.join(absOut, 'sections', 'notes.json'), { ok: true, items: notes.all });
-
-  writeJson(path.join(absOut, 'dashboard.json'), {
-    ok: true,
-    profile: profile,
-    sectionOrder: order.length ? order : ['courses','exhibitions','projects','notes'],
-    courses: courses.active,
-    exhibitions: exhibitions.active,
-    projects: projects.active,
-    notes: notes.active
-  });
 
   return {
     profile: profile,

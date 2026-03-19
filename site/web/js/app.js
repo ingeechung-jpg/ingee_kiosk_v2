@@ -82,12 +82,7 @@
       if (method === 'getDashboardData') {
         loadStaticRaw().then(function(data) {
           onSuccess && onSuccess(data);
-        }).catch(function() {
-          fetchJson('dashboard.json').then(function(data) {
-            if (data && data.ok === false) throw new Error(data.message || 'Static dashboard error');
-            onSuccess && onSuccess(data);
-          }).catch(function(err) { onFailure && onFailure(err); });
-        });
+        }).catch(function(err) { onFailure && onFailure(err); });
         return;
       }
       if (method === 'getSectionItems') {
@@ -97,8 +92,9 @@
           onSuccess && onSuccess({ ok: true, items: sec.all });
           return;
         }
-        fetchJson('sections/' + sectionKey + '.json').then(function(data) {
-          onSuccess && onSuccess(data);
+        loadStaticRaw().then(function(data) {
+          var key = sectionKey + 'All';
+          onSuccess && onSuccess({ ok: true, items: data && data[key] ? data[key] : [] });
         }).catch(function(err) { onFailure && onFailure(err); });
         return;
       }
