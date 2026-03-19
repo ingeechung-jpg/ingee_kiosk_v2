@@ -56,17 +56,7 @@ function publishDocs_() {
   while (files.hasNext()) {
     const file = files.next();
     const updated = file.getLastUpdated();
-    let textHash = '';
-    try {
-      const doc = DocumentApp.openById(file.getId());
-      const text = doc.getBody().getText() || '';
-      textHash = hashString_(text);
-    } catch (err) {
-      Logger.log('Failed to read doc text: ' + file.getId() + ' ' + err);
-      textHash = '';
-    }
-    const stamp = updated ? updated.getTime() : 0;
-    const hash = hashString_(stamp + '::' + textHash);
+    const hash = String(updated ? updated.getTime() : 0);
     const cacheKey = 'doc:' + file.getId();
     if (isUnchanged_(cacheKey, hash)) continue;
     const blob = exportDocx_(file.getId());

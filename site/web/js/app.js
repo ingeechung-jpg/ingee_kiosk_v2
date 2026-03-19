@@ -307,7 +307,7 @@
       var mdInline = '';
       if (docRef) {
         mdPath = 'raw/md/' + sanitizeFileName(docRef) + '.md';
-      } else if ((text && /\\.md$/i.test(String(text))) || String(text).indexOf('raw/md/') === 0 || String(text).indexOf('notes/') === 0) {
+      } else if ((text && /\\.md$/i.test(String(text))) || String(text).indexOf('raw/md/') === 0) {
         mdPath = String(text);
       } else if (String(text).indexOf('http') === 0) {
         mdPath = String(text);
