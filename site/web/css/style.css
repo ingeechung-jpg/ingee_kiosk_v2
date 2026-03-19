@@ -10,6 +10,7 @@
     --shadow: 0 1.125rem 2.625rem rgba(17, 17, 17, 0.12);
     --content-max: 1600px;
     --content-gutter: 2.5rem;
+    --frame-width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2)));
     --date-col-width: 10ch; /* 0000.00.00 */
     --code-col-width: 12ch;
     --grid-gap: 0.6rem;
@@ -42,7 +43,7 @@
   .wrap {
     position: relative;
     z-index: 1;
-    width: min(var(--content-max), calc(100% - (var(--content-gutter) * 2)));
+    width: var(--frame-width);
     margin: 0 auto;
     padding: 0;
   }
@@ -735,7 +736,7 @@
     border: none !important;
     border-radius: 0.3125rem !important;
     background-color: rgba(255,255,255,0.9);
-    width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2))) !important;
+    width: var(--frame-width) !important;
     height: calc(100vh - 10.8125rem) !important;
     max-height: calc(100vh - 10.8125rem) !important;
     padding: 0 !important;
@@ -774,7 +775,7 @@
     transform: translateX(-50%) !important;
     bottom: 0.75rem !important;
     top: auto !important;
-    width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2))) !important;
+    width: var(--frame-width) !important;
     min-height: 3.625rem !important;
     border-radius: 1rem !important;
     z-index: 10010 !important;
@@ -862,8 +863,6 @@
     :root { --content-gutter: 0.625rem; }
 
     body { padding-bottom: 5.375rem; }
-    .wrap { width: calc(100% - 1.25rem); }
-
     .profile { margin-bottom: 2rem; }
     .profile__name { font-size: 1.25rem; height: 3rem; }
 
@@ -915,6 +914,12 @@
       font-weight: 500;
       color: var(--muted);
       white-space: normal;
+    }
+    #section-courses .course-row__year .year-part,
+    #section-exhibitions .course-row__year .year-part,
+    #section-projects .course-row__year .year-part {
+      display: block;
+      line-height: 1.35;
     }
     .course-row__title {
       grid-column: 1 / 2;
@@ -1009,7 +1014,6 @@
       font-size: 0.85rem;
     }
     .qxCTlb {
-      width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2))) !important;
       min-height: 3.375rem !important;
       border-radius: 0.875rem !important;
       bottom: 0.625rem !important;
@@ -1018,7 +1022,6 @@
     .hur54b { padding: 3.8125rem var(--content-gutter) 5.375rem !important; }
 
     .mmGMM {
-      width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2))) !important;
       height: calc(100vh - 9.1875rem) !important;
       max-height: calc(100vh - 9.1875rem) !important;
       border-radius: 0.3125rem !important;
@@ -1045,12 +1048,3 @@
   gap: 0;
 }
 .course-row__year .year-part { display: inline; }
-
-@media (max-width: 800px) {
-  #section-courses .course-row__year .year-part,
-  #section-exhibitions .course-row__year .year-part,
-  #section-projects .course-row__year .year-part {
-    display: block;
-    line-height: 1.35;
-  }
-}
