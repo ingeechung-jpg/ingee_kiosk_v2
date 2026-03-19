@@ -945,10 +945,7 @@
     var label = detail.querySelector('.note-detail__label');
     var prose = targetEl.querySelector('.note-prose');
     if (!label || !prose) return;
-    var oldBottom = targetEl.querySelector('.note-footnotes-bottom');
-    if (oldBottom) oldBottom.remove();
-
-    var refs = prose.querySelectorAll('.note-fn-ref[data-fn-id], .note-fn-anchor[data-fn-id]');
+    var refs = prose.querySelectorAll('.note-fn-ref[data-fn-id]');
     var figures = prose.querySelectorAll('figure');
     label.innerHTML = '';
     if ((!refs.length || !footnotes) && !figures.length) return;

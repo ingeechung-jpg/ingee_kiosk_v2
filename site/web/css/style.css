@@ -321,7 +321,6 @@
   white-space: nowrap;
 }
 
-  .course-row__link,
   .course-row__link-btn,
   .course-row__nolink {
     font-size: 1rem;
@@ -332,7 +331,6 @@
     justify-content: flex-end;
   }
 
-  .course-row__link,
   .course-row__link-btn {
     color: var(--text);
     text-decoration: underline;
@@ -473,30 +471,6 @@
     line-height: 1.6;
   }
 
-  .note-footnotes-bottom {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-  }
-
-  .note-footnotes-bottom__item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    letter-spacing: -0.005em;
-    margin-bottom: 0.25rem;
-  }
-
-  .note-footnotes-bottom__item:last-child { margin-bottom: 0; }
-
-  .note-footnotes-bottom__num {
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-
   .note-prose h1,
   .note-prose h2,
   .note-prose h3 {
@@ -524,8 +498,7 @@
   }
 
   .note-prose a,
-  .note-sidenote__text a,
-  .note-footnotes-bottom__text a {
+  .note-sidenote__text a {
     color: var(--muted) !important;
     text-decoration: underline;
     text-underline-offset: 0.2em;
@@ -533,8 +506,7 @@
     text-decoration-color: var(--line-strong);
   }
   .note-prose a:hover,
-  .note-sidenote__text a:hover,
-  .note-footnotes-bottom__text a:hover { text-decoration-color: var(--muted); }
+  .note-sidenote__text a:hover { text-decoration-color: var(--muted); }
 
   .note-prose ul,
   .note-prose ol {
@@ -618,30 +590,6 @@
     display: block;
     border-radius: 0.25rem;
     background: var(--line);  /* 로딩 중 placeholder */
-  }
-
-  .note-inline-img {
-    aspect-ratio: var(--ar, 4 / 3);
-    object-fit: cover;
-    background: linear-gradient(100deg, rgba(230,230,230,0.75) 15%, rgba(245,245,245,0.95) 40%, rgba(230,230,230,0.75) 65%);
-    background-size: 200% 100%;
-    opacity: 0.75;
-    filter: saturate(0.9);
-    transition: opacity 0.28s ease, filter 0.28s ease;
-  }
-
-  .note-inline-img.is-loading {
-    animation: noteImgLoading 1.2s linear infinite;
-  }
-
-  .note-inline-img:not(.is-loading) {
-    opacity: 1;
-    filter: none;
-  }
-
-  @keyframes noteImgLoading {
-    from { background-position: 200% 0; }
-    to { background-position: 0 0; }
   }
 
   /* 이미지 캡션: 왼쪽 레이블과 같은 컬러/크기 */
@@ -1007,7 +955,6 @@
       font-size: 0.7rem;
       font-weight: 500;
     }
-    .course-row__link,
     .course-row__link-btn,
     .course-row__nolink { justify-self: end; font-size: 0.9rem; }
 
@@ -1061,9 +1008,6 @@
       margin-bottom: 0.35rem;
       font-size: 0.85rem;
     }
-    .note-footnotes-bottom { margin-top: 0.875rem; padding-top: 0.625rem; }
-    .note-footnotes-bottom__item { font-size: 0.85rem; }
-
     .qxCTlb {
       width: min(var(--content-max), calc(100vw - (var(--content-gutter) * 2))) !important;
       min-height: 3.375rem !important;
