@@ -22,6 +22,14 @@ function copyDir(src, dest) {
   entries.forEach(function(entry) {
     var from = path.join(src, entry.name);
     var to = path.join(dest, entry.name);
+    var rel = path.relative(SITE_SRC, from).replace(/\\/g, '/');
+    if (
+      rel === 'background-studio.html' ||
+      rel === 'css/background-studio.css' ||
+      rel === 'js/background-studio.js'
+    ) {
+      return;
+    }
     if (entry.isDirectory()) {
       copyDir(from, to);
     } else if (entry.isFile()) {

@@ -17,86 +17,283 @@
           <p class="studio-panel__eyebrow">Background Studio</p>
           <h1 class="studio-panel__title">Kiosk background controller</h1>
         </div>
-        <a class="studio-panel__link" href="./index.html">Open kiosk</a>
-      </div>
-
-      <div class="studio-toolbar">
-        <label class="studio-field">
-          <span class="studio-field__label">Preset library</span>
-          <select id="preset-select" class="studio-select"></select>
-        </label>
-        <div class="studio-toolbar__actions">
-          <button id="new-preset-btn" class="studio-btn studio-btn--ghost" type="button">New</button>
-          <button id="delete-preset-btn" class="studio-btn studio-btn--ghost" type="button">Delete</button>
+        <div class="studio-panel__header-actions">
+          <button id="panel-toggle-btn" class="studio-btn studio-btn--ghost studio-btn--compact" type="button">Hide UI</button>
+          <a class="studio-panel__link" href="./index.html">Open kiosk</a>
         </div>
       </div>
 
-      <div class="studio-grid">
-        <label class="studio-field">
-          <span class="studio-field__label">Preset name</span>
-          <input id="preset-name" class="studio-input" type="text" placeholder="Kiosk circle wave v4">
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Generator</span>
-          <select id="engine-select" class="studio-select">
-            <option value="circle-wave">Kiosk Circle Wave</option>
-            <option value="random-wave">Kiosk Random Wave</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="studio-grid studio-grid--sliders">
-        <label class="studio-field">
-          <span class="studio-field__label">Color count</span>
-          <input id="color-count" class="studio-range" type="range" min="2" max="8" step="1">
-          <span id="color-count-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Source count</span>
-          <input id="source-count" class="studio-range" type="range" min="1" max="8" step="1">
-          <span id="source-count-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Rings</span>
-          <input id="rings" class="studio-range" type="range" min="1" max="16" step="0.1">
-          <span id="rings-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Spread</span>
-          <input id="spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
-          <span id="spread-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Speed</span>
-          <input id="speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
-          <span id="speed-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Orbit</span>
-          <input id="orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
-          <span id="orbit-value" class="studio-field__value"></span>
-        </label>
-        <label class="studio-field">
-          <span class="studio-field__label">Noise</span>
-          <input id="noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
-          <span id="noise-value" class="studio-field__value"></span>
-        </label>
-      </div>
-
-      <section class="studio-colors">
-        <div class="studio-colors__header">
-          <h2 class="studio-colors__title">Palette</h2>
-          <p class="studio-colors__hint">Adjust each color directly and watch the canvas update live.</p>
+      <div class="studio-panel__body">
+        <div class="studio-toolbar">
+          <label class="studio-field">
+            <span class="studio-field__label">Preset library</span>
+            <select id="preset-select" class="studio-select"></select>
+          </label>
+          <div class="studio-toolbar__actions">
+            <button id="new-preset-btn" class="studio-btn studio-btn--ghost" type="button">New</button>
+            <button id="delete-preset-btn" class="studio-btn studio-btn--ghost" type="button">Delete</button>
+          </div>
         </div>
-        <div id="palette-controls" class="studio-colors__grid"></div>
-      </section>
 
-      <div class="studio-actions">
-        <button id="save-preset-btn" class="studio-btn" type="button">Save preset</button>
-        <button id="push-preset-btn" class="studio-btn studio-btn--primary" type="button">Push to kiosk</button>
+        <div class="studio-grid">
+          <label class="studio-field">
+            <span class="studio-field__label">Preset name</span>
+            <input id="preset-name" class="studio-input" type="text" placeholder="Kiosk circle wave v4">
+          </label>
+          <label class="studio-field">
+            <span class="studio-field__label">Generator</span>
+            <select id="engine-select" class="studio-select">
+              <option value="circle-wave">Kiosk Circle Wave</option>
+              <option value="random-wave">Kiosk Random Wave</option>
+              <option value="contour-field">Kiosk Contour Field</option>
+              <option value="prism-bloom">Kiosk Prism Bloom</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="studio-effect-controls">
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Common Controls</h2>
+            <p class="studio-colors__hint">Website tone controls that affect the kiosk UI layer.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Text color</span>
+              <input id="theme-text" class="studio-color__swatch" type="color" value="#111111">
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Muted color</span>
+              <input id="theme-muted" class="studio-color__swatch" type="color" value="#5f5f5f">
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Hover color</span>
+              <input id="theme-hover" class="studio-color__swatch" type="color" value="#d9d9d9">
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Underline color</span>
+              <input id="theme-line" class="studio-color__swatch" type="color" value="#111111">
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Section card opacity</span>
+              <input id="theme-card-opacity" class="studio-range" type="range" min="0.08" max="1" step="0.01">
+              <span id="theme-card-opacity-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Hover opacity</span>
+              <input id="theme-hover-opacity" class="studio-range" type="range" min="0" max="1" step="0.01">
+              <span id="theme-hover-opacity-value" class="studio-field__value"></span>
+            </label>
+          </div>
+        </section>
+
+        <section id="effect-controls-circle" class="studio-effect-controls" hidden>
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Circle Wave Controls</h2>
+            <p class="studio-colors__hint">Adjust orbiting ring sources, density, and distortion.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Source count</span>
+              <input id="source-count" class="studio-range" type="range" min="1" max="8" step="1">
+              <span id="source-count-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Rings</span>
+              <input id="rings" class="studio-range" type="range" min="1" max="16" step="0.1">
+              <span id="rings-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Spread</span>
+              <input id="spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
+              <span id="spread-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Speed</span>
+              <input id="speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
+              <span id="speed-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Orbit</span>
+              <input id="orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
+              <span id="orbit-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Noise</span>
+              <input id="noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
+              <span id="noise-value" class="studio-field__value"></span>
+            </label>
+          </div>
+        </section>
+
+        <section id="effect-controls-random" class="studio-effect-controls" hidden>
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Random Wave Controls</h2>
+            <p class="studio-colors__hint">Control the number of drifting wave sources and how chaotic they feel.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Source count</span>
+              <input id="random-source-count" class="studio-range" type="range" min="1" max="8" step="1">
+              <span id="random-source-count-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Rings</span>
+              <input id="random-rings" class="studio-range" type="range" min="1" max="16" step="0.1">
+              <span id="random-rings-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Spread</span>
+              <input id="random-spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
+              <span id="random-spread-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Speed</span>
+              <input id="random-speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
+              <span id="random-speed-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Orbit</span>
+              <input id="random-orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
+              <span id="random-orbit-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Noise</span>
+              <input id="random-noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
+              <span id="random-noise-value" class="studio-field__value"></span>
+            </label>
+          </div>
+        </section>
+
+        <section id="effect-controls-contour" class="studio-effect-controls" hidden>
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Contour Field Controls</h2>
+            <p class="studio-colors__hint">Tune density, drift, and the horizontal field split that shapes the layered landscape.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Band count</span>
+              <input id="contour-source-count" class="studio-range" type="range" min="1" max="8" step="1">
+              <span id="contour-source-count-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Density</span>
+              <input id="contour-rings" class="studio-range" type="range" min="1" max="16" step="0.1">
+              <span id="contour-rings-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Spread</span>
+              <input id="contour-spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
+              <span id="contour-spread-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Speed</span>
+              <input id="contour-speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
+              <span id="contour-speed-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Noise</span>
+              <input id="contour-noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
+              <span id="contour-noise-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Orbit</span>
+              <input id="contour-orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
+              <span id="contour-orbit-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Horizon</span>
+              <input id="field-horizon" class="studio-range" type="range" min="-0.4" max="0.4" step="0.01">
+              <span id="field-horizon-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Tilt</span>
+              <input id="field-tilt" class="studio-range" type="range" min="-1.2" max="1.2" step="0.01">
+              <span id="field-tilt-value" class="studio-field__value"></span>
+            </label>
+          </div>
+        </section>
+
+        <section id="effect-controls-prism" class="studio-effect-controls" hidden>
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Prism Bloom Controls</h2>
+            <p class="studio-colors__hint">Shape glossy bloom clusters, overall split composition, and the way light spreads across the frame.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Cluster count</span>
+              <input id="prism-source-count" class="studio-range" type="range" min="1" max="8" step="1">
+              <span id="prism-source-count-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Spread</span>
+              <input id="prism-spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
+              <span id="prism-spread-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Speed</span>
+              <input id="prism-speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
+              <span id="prism-speed-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Noise</span>
+              <input id="prism-noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
+              <span id="prism-noise-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Orbit</span>
+              <input id="prism-orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
+              <span id="prism-orbit-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Horizon</span>
+              <input id="prism-field-horizon" class="studio-range" type="range" min="-0.4" max="0.4" step="0.01">
+              <span id="prism-field-horizon-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Tilt</span>
+              <input id="prism-field-tilt" class="studio-range" type="range" min="-1.2" max="1.2" step="0.01">
+              <span id="prism-field-tilt-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Glow</span>
+              <input id="prism-glow" class="studio-range" type="range" min="0.4" max="2.2" step="0.01">
+              <span id="prism-glow-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Twist</span>
+              <input id="prism-twist" class="studio-range" type="range" min="0.8" max="6" step="0.01">
+              <span id="prism-twist-value" class="studio-field__value"></span>
+            </label>
+            <label class="studio-field">
+              <span class="studio-field__label">Softness</span>
+              <input id="prism-softness" class="studio-range" type="range" min="0.4" max="1.6" step="0.01">
+              <span id="prism-softness-value" class="studio-field__value"></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="studio-colors">
+          <div class="studio-colors__header">
+            <h2 class="studio-colors__title">Palette</h2>
+            <p class="studio-colors__hint">Adjust the generator palette directly and watch the canvas update live.</p>
+          </div>
+          <div class="studio-grid studio-grid--sliders">
+            <label class="studio-field">
+              <span class="studio-field__label">Color count</span>
+              <input id="color-count" class="studio-range" type="range" min="2" max="8" step="1">
+              <span id="color-count-value" class="studio-field__value"></span>
+            </label>
+          </div>
+          <div id="palette-controls" class="studio-colors__grid"></div>
+        </section>
+
+        <div class="studio-actions">
+          <button id="save-preset-btn" class="studio-btn" type="button">Save preset</button>
+          <button id="push-preset-btn" class="studio-btn studio-btn--primary" type="button">Save background.json</button>
+        </div>
+
+        <p id="studio-status" class="studio-status">Select a preset or start a new one.</p>
       </div>
-
-      <p id="studio-status" class="studio-status">Select a preset or start a new one.</p>
     </section>
   </main>
 

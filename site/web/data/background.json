@@ -1,0 +1,30 @@
+{
+  "id": "kiosk-circle-wave",
+  "label": "Kiosk Wave",
+  "engine": "circle-wave",
+  "colors": [
+    "#ffc677",
+    "#ff8647",
+    "#e392fe"
+  ],
+  "sourceCount": 1,
+  "rings": 4.5,
+  "spread": 0.75,
+  "speed": 1.5,
+  "noise": 0.14,
+  "orbit": 0.28,
+  "fieldHorizon": 0,
+  "fieldTilt": 0,
+  "prismGlow": 1,
+  "prismTwist": 2.5,
+  "prismSoftness": 1,
+  "themeText": "#000000",
+  "themeMuted": "#000000",
+  "themeLine": "#111111",
+  "themeHover": "#ffaa00",
+  "themeHoverOpacity": 0.59,
+  "themeCardOpacity": 0.3,
+  "cleanCircle": false,
+  "updatedAt": "2026-03-20T10:01:25.056Z",
+  "builtIn": true
+}

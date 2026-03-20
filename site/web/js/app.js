@@ -385,7 +385,49 @@
 
   function initWebGLBackground() {
     if (!window.KioskBackground || !window.KioskBackground.startCanvas) return;
-    window.KioskBackground.startCanvas('gradient-canvas');
+    fetchJson('background.json').then(function(preset) {
+      applyThemePreset(preset);
+      window.KioskBackground.startCanvas('gradient-canvas', { preset: preset });
+    }).catch(function() {
+      window.KioskBackground.startCanvas('gradient-canvas');
+    });
+  }
+
+  function hexToRgba(hex, alpha) {
+    var value = String(hex || '').replace('#', '');
+    if (!/^[0-9a-fA-F]{6}$/.test(value)) return '';
+    var parsed = parseInt(value, 16);
+    var r = (parsed >> 16) & 255;
+    var g = (parsed >> 8) & 255;
+    var b = parsed & 255;
+    var a = Number(alpha);
+    if (isNaN(a)) a = 0.05;
+    a = Math.max(0, Math.min(1, a));
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a.toFixed(2) + ')';
+  }
+
+  function applyThemePreset(preset) {
+    if (!preset) return;
+    var root = document.documentElement;
+    var text = String(preset.themeText || '#111111');
+    var muted = String(preset.themeMuted || '#5f5f5f');
+    var line = String(preset.themeLine || '#111111');
+    var hover = String(preset.themeHover || '#d9d9d9');
+    var hoverOpacity = Number(preset.themeHoverOpacity || 0.05);
+    var opacity = Number(preset.themeCardOpacity || 0.3);
+    if (root && /^#[0-9a-fA-F]{6}$/.test(text)) root.style.setProperty('--text', text);
+    if (root && /^#[0-9a-fA-F]{6}$/.test(muted)) root.style.setProperty('--muted', muted);
+    if (root && /^#[0-9a-fA-F]{6}$/.test(line)) {
+      root.style.setProperty('--line', line);
+      root.style.setProperty('--line-strong', line);
+    }
+    if (root && /^#[0-9a-fA-F]{6}$/.test(hover)) root.style.setProperty('--hover-bg', hexToRgba(hover, hoverOpacity));
+    if (root && !isNaN(opacity)) {
+      root.style.setProperty('--section-card-bg', 'rgba(255, 255, 255, ' + opacity.toFixed(2) + ')');
+      root.style.setProperty('--surface', 'rgba(255, 255, 255, ' + opacity.toFixed(2) + ')');
+      root.style.setProperty('--section-card-blur', opacity >= 0.98 ? 'none' : 'blur(0.5rem)');
+      root.style.setProperty('--section-card-webkit-blur', opacity >= 0.98 ? 'none' : 'blur(0.5rem)');
+    }
   }
 
   function initCalendarPopupToggle() {

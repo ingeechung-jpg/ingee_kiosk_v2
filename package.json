@@ -3,6 +3,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "studio": "node scripts/studio-server.js",
     "build:raw-md": "node scripts/build-raw-md.js",
     "build:content": "node scripts/build-content.js",
     "build:site": "node scripts/build-site.js",
