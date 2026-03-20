@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Background Studio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="./css/background-studio.css">
+</head>
+<body>
+  <canvas id="studio-canvas" class="studio-canvas" aria-hidden="true"></canvas>
+
+  <main class="studio-shell">
+    <section class="studio-panel">
+      <div class="studio-panel__header">
+        <div>
+          <p class="studio-panel__eyebrow">Background Studio</p>
+          <h1 class="studio-panel__title">Kiosk background controller</h1>
+        </div>
+        <a class="studio-panel__link" href="./index.html">Open kiosk</a>
+      </div>
+
+      <div class="studio-toolbar">
+        <label class="studio-field">
+          <span class="studio-field__label">Preset library</span>
+          <select id="preset-select" class="studio-select"></select>
+        </label>
+        <div class="studio-toolbar__actions">
+          <button id="new-preset-btn" class="studio-btn studio-btn--ghost" type="button">New</button>
+          <button id="delete-preset-btn" class="studio-btn studio-btn--ghost" type="button">Delete</button>
+        </div>
+      </div>
+
+      <div class="studio-grid">
+        <label class="studio-field">
+          <span class="studio-field__label">Preset name</span>
+          <input id="preset-name" class="studio-input" type="text" placeholder="Kiosk circle wave v4">
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Generator</span>
+          <select id="engine-select" class="studio-select">
+            <option value="circle-wave">Kiosk Circle Wave</option>
+            <option value="random-wave">Kiosk Random Wave</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="studio-grid studio-grid--sliders">
+        <label class="studio-field">
+          <span class="studio-field__label">Color count</span>
+          <input id="color-count" class="studio-range" type="range" min="2" max="8" step="1">
+          <span id="color-count-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Source count</span>
+          <input id="source-count" class="studio-range" type="range" min="1" max="8" step="1">
+          <span id="source-count-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Rings</span>
+          <input id="rings" class="studio-range" type="range" min="1" max="16" step="0.1">
+          <span id="rings-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Spread</span>
+          <input id="spread" class="studio-range" type="range" min="0.15" max="1.6" step="0.01">
+          <span id="spread-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Speed</span>
+          <input id="speed" class="studio-range" type="range" min="0.05" max="1.5" step="0.01">
+          <span id="speed-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Orbit</span>
+          <input id="orbit" class="studio-range" type="range" min="0" max="0.5" step="0.01">
+          <span id="orbit-value" class="studio-field__value"></span>
+        </label>
+        <label class="studio-field">
+          <span class="studio-field__label">Noise</span>
+          <input id="noise" class="studio-range" type="range" min="0" max="1.5" step="0.01">
+          <span id="noise-value" class="studio-field__value"></span>
+        </label>
+      </div>
+
+      <section class="studio-colors">
+        <div class="studio-colors__header">
+          <h2 class="studio-colors__title">Palette</h2>
+          <p class="studio-colors__hint">Adjust each color directly and watch the canvas update live.</p>
+        </div>
+        <div id="palette-controls" class="studio-colors__grid"></div>
+      </section>
+
+      <div class="studio-actions">
+        <button id="save-preset-btn" class="studio-btn" type="button">Save preset</button>
+        <button id="push-preset-btn" class="studio-btn studio-btn--primary" type="button">Push to kiosk</button>
+      </div>
+
+      <p id="studio-status" class="studio-status">Select a preset or start a new one.</p>
+    </section>
+  </main>
+
+  <script src="./js/background-engine.js"></script>
+  <script src="./js/background-studio.js"></script>
+</body>
+</html>
