@@ -10,7 +10,7 @@
   "sourceCount": 1,
   "rings": 4.5,
   "spread": 0.75,
-  "speed": 1.5,
+  "speed": 0.4,
   "noise": 0.14,
   "orbit": 0.28,
   "fieldHorizon": 0,
@@ -25,6 +25,6 @@
   "themeHoverOpacity": 0.59,
   "themeCardOpacity": 0.3,
   "cleanCircle": false,
-  "updatedAt": "2026-03-20T10:01:25.056Z",
+  "updatedAt": "2026-03-20T10:10:22.127Z",
   "builtIn": true
 }
