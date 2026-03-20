@@ -370,7 +370,7 @@
     text-decoration: underline;
     text-underline-offset: 0.25rem;
   }
-  .course-row__nolink { color: #c8c8c8; }
+  .course-row__nolink { color: var(--text); }
 
   /* ── NOTE ROW ── */
   .note-item {
@@ -812,8 +812,8 @@
     justify-content: center !important;
     font-size: 1rem !important;
     font-weight: 700 !important;
-    color: #000 !important;
-    -webkit-text-fill-color: #000 !important;
+    color: var(--text) !important;
+    -webkit-text-fill-color: var(--text) !important;
     text-shadow: 0 1px 0 rgba(255,255,255,0.38) !important;
     letter-spacing: 0.01em !important;
     padding: 0 1.5rem !important;
@@ -842,8 +842,8 @@
   }
 
   .qxCTlb, .qxCTlb * {
-    color: #000 !important;
-    -webkit-text-fill-color: #000 !important;
+    color: var(--text) !important;
+    -webkit-text-fill-color: var(--text) !important;
     opacity: 1 !important;
   }
 
@@ -859,8 +859,8 @@
   .qxCTlb > * {
     position: relative;
     z-index: 1;
-    color: #000 !important;
-    -webkit-text-fill-color: #000 !important;
+    color: var(--text) !important;
+    -webkit-text-fill-color: var(--text) !important;
     opacity: 1 !important;
   }
 
